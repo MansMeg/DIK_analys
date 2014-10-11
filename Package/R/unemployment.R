@@ -1,0 +1,209 @@
+#' @title
+#' Read in DIK unemployment files from AEA
+#' 
+#' @param file_path
+#' Path to an AEA file
+#' 
+#' @description
+#' All files are read in to R and put in one data.frame, checks that the file is correct
+#' is conducted.
+#' 
+#' @return
+#' \code{data.frame} of class AEA_data.
+#' 
+#' @export
+#' 
+read_AEA_file <- function(file_path){
+  if(!file.exists(file_path)) stop("File does not exist.")
+    
+  AEAdf <- read.csv(file = file_path, 
+                    fileEncoding="cp1252", stringsAsFactors=TRUE)
+
+  # File checks
+  var_names <- 
+    c("manad", "forbund", "alder", "kon", "lan", "ers", "utbprogram", "infopost",
+      "avisering", "stat1", "stat2", "stat3", "stat4", "stat5")
+  var_exist <- var_names %in% names(AEAdf)
+  if(!all(var_exist)) warning(paste0("The following variables is missing: \n'", 
+                                     paste(var_names[!var_exist], collapse = "', '"), "'"), call. = FALSE)
+  
+  if(!all(c("Studerande") %in% levels(AEAdf$stat1))) warning("'Studerande' is missing in variable 'stat1'.", call. = FALSE)
+  if(!all(c("Direkt","Förbund") %in% levels(AEAdf$avisering))) warning("'Direkt' and/or 'Förbund' is missing in variable 'avisering'.", call. = FALSE)
+  if(!all(c("X") %in% levels(AEAdf$ers))) warning("'X' is missing in variable 'ers'.", call. = FALSE)
+  if(!all(c("X") %in% levels(AEAdf$infopost))) warning("'X' is missing in variable 'infopost'.", call. = FALSE)
+  
+  # "Jobb och utvecklingsgaranti"
+  
+  # Corrections
+  levels(AEAdf$lan)[levels(AEAdf$lan) == ""] <- "Okänd"
+  
+  # Setting addition class
+  class(AEAdf) <- c("AEA_data", "data.frame")
+  
+  return(AEAdf)
+}
+
+
+
+#' @title
+#' Check if x has class AEA_data
+#' 
+#' @param x object to check.
+#' 
+#' @description
+#' Test if x is an object of class AEA_data, otherwise generates warning.
+#' 
+#' 
+check_AEA_class <- function(x){
+  if(!"AEA_data" %in% class(x)) warning("Data not read with read_AEA_files()", call. = FALSE)
+}
+
+#' @title
+#' Calculate all statistics
+#' 
+#' @param AEA_data
+#' Data set from AEA read into R.
+#' 
+#' @description
+#' Calculates all statistics of interest and store it as list.
+#' 
+#' @export
+#' 
+calc_stat <- function(AEA_data){
+  check_AEA_class(AEA_data)
+  
+  dik_stat <- list()
+  
+  # Medlemmar i AEA
+  dik_stat[["Medlemmar ej 65 ar fyllda"]] <- 
+    calc_member_aea_stat(AEA_data[AEA_data$alder < 65, ])
+  dik_stat[["Medlemmar ej 65 ar fyllda som ej studerar"]] <- 
+    calc_member_aea_stat(AEA_data = AEA_data[AEA_data$alder < 65 & AEA_data$stat1 != "Studerande", ])
+  
+  # Ersättningstagare
+  # Remove nonmembers of AEA
+  AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$stat1 != "Studerande" & AEA_data$avisering %in% c("Direkt", "Förbund"), ]
+  dik_stat[["Ers, akt-stod, anst-stod"]] <-
+    calc_ers_stat(AEA_member_data)
+
+  arbmark <- calc_arbmarkn_stat(AEA_data)
+  dik_stat[["Arbetsmarknadspolitiska program 1"]] <-  
+    arbmark[[1]]
+  dik_stat[["Arbetsmarknadspolitiska program 2"]] <-  
+    arbmark[[2]]
+  
+  dik_stat[["Ers. efter kon: Man"]] <-
+    calc_ers_stat(AEA_member_data[AEA_member_data$kon == "M", ])
+  dik_stat[["Ers. efter kon: Kvinna"]] <-
+    calc_ers_stat(AEA_member_data[AEA_member_data$kon == "K", ])
+  dik_stat[["Ers. efter lan"]] <-
+    do.call(rbind, lapply(split(x = AEA_member_data, AEA_member_data$lan), calc_ers_stat))
+  
+  age_cat <- cut(AEA_member_data$alder,breaks = c(0, seq(25, 65, by = 5)), right = FALSE)
+  levels(age_cat) <- 
+    c("< 25", paste(seq(25,60,5), seq(29,64,5), sep = "-"))
+  dik_stat[["Ers. efter alder"]] <-
+    do.call(rbind, lapply(split(x = AEA_member_data, age_cat), calc_ers_stat))
+
+}
+
+
+#' @title
+#' Calculates labor force program statistics
+#' 
+#' @param AEA_data
+#' AEA data set
+#' 
+#' @description
+#' Calculates labor force program statistics
+#' 
+#' @export
+#' 
+calc_arbmarkn_stat <- function(AEA_data){
+  
+  arbmark <- table(AEA_member_data$utbprogram)
+
+  arb_program1 <-
+    data.frame(program = names(arbmark), antal = as.vector(arbmark))[-1, ,drop=FALSE]
+  arb_program1 <- rbind(arb_program1, 
+                       data.frame(program = "totalt", antal = sum(arb_program1$antal)))
+
+  arb_program2 <- 
+    data.frame(totalt = arb_program1[arb_program1$program == "totalt", "antal"])
+  arb_program2$ers_tagare <- sum(AEA_data$utbprogram != "" & AEA_data$ers == "X")
+  arb_program2$arb_m_stod <- sum(AEA_data$utbprogram != "" & AEA_data$ers != "X" & AEA_data$infopost != "X")
+  arb_program2$i_prg_utan_ers <- arb_program2$totalt - arb_program2$ers_tagare
+  arb_program2$aktivitetsers <- arb_program2$totalt - arb_program2$ers_tagare - arb_program2$arb_m_stod
+  arb_program2$jug <- arb_program1[arb_program1$program == "Jobb och utvecklingsgaranti", "antal"]
+  arb_program2$fas3 <- arb_program1[arb_program1$program == "Jobb o utvecklingsgaranti fas 3", "antal"]
+  arb_program2$ovriga <- arb_program2$totalt - arb_program2$arb_m_stod - arb_program2$jug - arb_program2$fas3
+  arb_program2 <- arb_program2[, c(1, 4, 5, 2, 3, 6, 7, 8)]
+
+  res <- list(arb_program1, arb_program2)
+  return(res)  
+}
+
+
+
+#' @title
+#' Calculates membership statistics
+#' 
+#' @param AEA_data
+#' AEA data set
+#' 
+#' @description
+#' Calculate membership statistics
+#' 
+#' @export
+#' 
+calc_member_aea_stat <- function(AEA_data){
+
+  av <- table(AEA_data$avisering)
+  res <- 
+    data.frame(direktaviserade = av["Direkt"], 
+               forbundsaviserade = av["Förbund"])
+  res$tot_i_dik_och_aea <- res$direktaviserade + res$forbundsaviserade
+  res$antal_medlemmar_dik <- nrow(AEA_data)
+  res$andel_aea_anslutna <- res$tot_i_dik_och_aea / res$antal_medlemmar_dik
+  res$andel_direktaviserade <- res$direktaviserade / res$tot_i_dik_och_aea
+  
+  rownames(res) <- NULL
+  return(res)  
+}
+
+#' @title
+#' Calculates allowance statistics
+#' 
+#' @param AEA_data
+#' AEA data set
+#' 
+#' @description
+#' Calculate allowance statistics for the whole data.
+#' 
+#' @export
+#' 
+calc_ers_stat <- function(AEA_data){
+
+  res <- 
+    data.frame(tot_i_dik_och_aea = nrow(AEA_data))
+  res$ers_tagare_antal <- sum(AEA_data$ers=="X")
+  res$ers_tagare_andel <- res$ers_tagare_antal / res$tot_i_dik_och_aea
+  res$akt_stod_antal <- sum(AEA_data$utbprogram != "" & AEA_data$ers != "X" & AEA_data$infopost == "X")
+  res$akt_stod_andel <- res$akt_stod_antal / res$tot_i_dik_och_aea
+  res$ers_akt_stod_antal <- res$ers_tagare_antal + res$akt_stod_antal
+  res$ers_akt_stod_andel <- res$ers_akt_stod_antal / res$tot_i_dik_och_aea
+  res$anst_m_stod_antal <- sum(AEA_data$utbprogram != "" & AEA_data$ers != "X" & AEA_data$infopost != "X")
+  res$anst_m_stod_andel <- res$anst_m_stod_antal / res$tot_i_dik_och_aea
+  
+  rownames(res) <- NULL
+  return(res)  
+}
+
+write_unemp_stat <- function(path){
+  
+}
+
+
+create_unemp_plots <- function(AEA_dataframe){
+  
+}

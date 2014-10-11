@@ -199,6 +199,41 @@ calc_ers_stat <- function(AEA_data){
   return(res)  
 }
 
+
+#' @title
+#' Classifies based on DIK interest groups
+#' 
+#' @param x
+#' 
+#' 
+#' 
+#' @export
+#' 
+dik_classify <- function(x, type = c("utbildningsgrupp", "intressegrupp")){
+  x <- as.factor(x)
+  if(substr(type[1], 1, 3) == "utb"){
+    class_url <- "https://raw.githubusercontent.com/MansMeg/DIK_analys/master/Classification/Utbildningsgrupper.csv"
+  } else if (substr(type[1], 1, 3) == "int"){
+    class_url <- "https://raw.githubusercontent.com/MansMeg/DIK_analys/master/Classification/Intressegrupper.csv"
+  }
+  class_table <- suppressMessages(repmis::source_data(url = class_url, fileEncoding="cp1252", stringsAsFactors=FALSE))
+  
+  lev <- stringr::str_trim(levels(x))
+  names(lev) <- lev
+  logi <- tolower(class_table[,2]) %in% tolower(lev)
+  lev[class_table[logi,2]] <- class_table[logi,1]
+
+  not_in_class <- !tolower(lev) %in% tolower(class_table[,2])
+  if(any(not_in_class)) {
+    warning("The following classes has not been classified:\n'",
+            paste(lev[not_in_class], collapse="'\n'"), "'")
+    lev[not_in_class] <- "NOT CLASSIFIED"
+  }
+  levels(x) <- lev
+  factor(as.character(x))
+}
+
+
 write_unemp_stat <- function(path){
   
 }

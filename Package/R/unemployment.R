@@ -71,45 +71,49 @@ check_AEA_class <- function(x){
 #' 
 calc_stat <- function(AEA_data){
   check_AEA_class(AEA_data)
-  
-  dik_stat <- list()
+
+  dik_stat <- list()  
+  dik_stat[["Month"]] <- as.character(AEA_data$manad[1])
   
   # Medlemmar i AEA
-  dik_stat[["Medlemmar ej 65 ar fyllda"]] <- 
+  dik_stat[["Medlemmar_ej_65_ar_fyllda"]] <- 
     calc_member_aea_stat(AEA_data[AEA_data$alder < 65, ])
-  dik_stat[["Medlemmar ej 65 ar fyllda som ej studerar"]] <- 
+  dik_stat[["Medlemmar_ej_65_ar_fyllda_som_ej_studerar"]] <- 
     calc_member_aea_stat(AEA_data = AEA_data[AEA_data$alder < 65 & AEA_data$stat1 != "Studerande", ])
   
   # Ersättningstagare
   # Remove nonmembers of AEA
   AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$stat1 != "Studerande" & AEA_data$avisering %in% c("Direkt", "Förbund"), ]
-  dik_stat[["Ers, akt-stod, anst-stod"]] <-
+  dik_stat[["Ers_aktstod_anststod"]] <-
     calc_ers_stat(AEA_member_data)
 
   arbmark <- calc_arbmarkn_stat(AEA_data)
-  dik_stat[["Arbetsmarknadspolitiska program 1"]] <-  
+  dik_stat[["Arbetsmarknadspolitiska_program_1"]] <-  
     arbmark[[1]]
-  dik_stat[["Arbetsmarknadspolitiska program 2"]] <-  
+  dik_stat[["Arbetsmarknadspolitiska_program_2"]] <-  
     arbmark[[2]]
   
-  dik_stat[["Ers. efter kon: Man"]] <-
+  dik_stat[["Ers_efter_kon_Man"]] <-
     calc_ers_stat(AEA_member_data[AEA_member_data$kon == "M", ])
-  dik_stat[["Ers. efter kon: Kvinna"]] <-
+  dik_stat[["Ers_efter_kon_Kvinna"]] <-
     calc_ers_stat(AEA_member_data[AEA_member_data$kon == "K", ])
-  dik_stat[["Ers. efter lan"]] <-
+  dik_stat[["Ers_efter_lan"]] <-
     do.call(rbind, lapply(split(x = AEA_member_data, AEA_member_data$lan), calc_ers_stat))
   
   age_cat <- cut(AEA_member_data$alder,breaks = c(0, seq(25, 65, by = 5)), right = FALSE)
   levels(age_cat) <- 
     c("< 25", paste(seq(25,60,5), seq(29,64,5), sep = "-"))
-  dik_stat[["Ers. efter alder"]] <-
+  dik_stat[["Ers_efter_alder"]] <-
     do.call(rbind, lapply(split(x = AEA_member_data, age_cat), calc_ers_stat))
   
-  dik_stat[["Intressegrupp"]] <-
+  dik_stat[["Ers_efter_Intrgr"]] <-
     do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(x = AEA_member_data$stat4, type = "intressegrupp")), calc_ers_stat))
-  dik_stat[["Utbildninsggrupp"]] <-
+  dik_stat[["Ers_efter_Utbgr"]] <-
     do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(AEA_member_data$stat3, "utbildningsgrupp")), calc_ers_stat))  
-  table(dik_classify(AEA_member_data$stat3))
+  dik_stat[["Ers_efter_UtbNiv"]] <-
+    do.call(rbind, lapply(split(x = AEA_member_data, AEA_member_data$stat2), calc_ers_stat))  
+
+  return(dik_stat)
 }
 
 #' @title
@@ -226,22 +230,22 @@ dik_classify <- function(x, type = c("utbildningsgrupp", "intressegrupp")){
   class_table[,2] <- tolower(class_table[,2])
   names(class_table)[2] <- "label"
   
-  add_label_df <- data.frame(rowno=1:length(levels(x)), label = tolower(stringr::str_trim(levels(x))), stringsAsFactors = FALSE)
+  add_label_df <- data.frame(rowno=1:length(levels(x)), Label = stringr::str_trim(levels(x)), label = tolower(stringr::str_trim(levels(x))), stringsAsFactors = FALSE)
   add_label_df <- merge(add_label_df, class_table, all.x = TRUE)
-  not_in_class <- is.na(add_label_df[,3])
+  not_in_class <- is.na(add_label_df[,4])
   
   if(any(not_in_class)) {
     warning("The following classes has not been classified:\n'",
-            paste(add_label_df$label[not_in_class], collapse="'\n'"), "'")
-    add_label_df[not_in_class, 3] <- "NOT CLASSIFIED"
+            paste(add_label_df$Label[not_in_class], collapse="'\n'"), "'")
+    add_label_df[not_in_class, 4] <- "NOT CLASSIFIED"
   }
-  levels(x) <- add_label_df[order(add_label_df$rowno), 3]
+  levels(x) <- add_label_df[order(add_label_df$rowno), 4]
   factor(as.character(x))
 }
 
 
 
-write_unemp_stat <- function(path){
+write_dik_stat <- function(dik_stat){
   
 }
 

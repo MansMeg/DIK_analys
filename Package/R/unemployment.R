@@ -104,9 +104,13 @@ calc_stat <- function(AEA_data){
     c("< 25", paste(seq(25,60,5), seq(29,64,5), sep = "-"))
   dik_stat[["Ers. efter alder"]] <-
     do.call(rbind, lapply(split(x = AEA_member_data, age_cat), calc_ers_stat))
-
+  
+  dik_stat[["Intressegrupp"]] <-
+    do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(x = AEA_member_data$stat4, type = "intressegrupp")), calc_ers_stat))
+  dik_stat[["Utbildninsggrupp"]] <-
+    do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(AEA_member_data$stat3, "utbildningsgrupp")), calc_ers_stat))  
+  table(dik_classify(AEA_member_data$stat3))
 }
-
 
 #' @title
 #' Calculates labor force program statistics
@@ -203,12 +207,14 @@ calc_ers_stat <- function(AEA_data){
 #' @title
 #' Classifies based on DIK interest groups
 #' 
-#' @param x
+#' @param x variable to classify
+#' @param type which classification to use ("utbildningsgrupp" or "intressegrupp")
 #' 
-#' 
+#' @details
+#' The functions classifies using the classifiers found here:
+#' \url{https://github.com/MansMeg/DIK_analys/tree/master/Classification}
 #' 
 #' @export
-#' 
 dik_classify <- function(x, type = c("utbildningsgrupp", "intressegrupp")){
   x <- as.factor(x)
   if(substr(type[1], 1, 3) == "utb"){
@@ -216,22 +222,23 @@ dik_classify <- function(x, type = c("utbildningsgrupp", "intressegrupp")){
   } else if (substr(type[1], 1, 3) == "int"){
     class_url <- "https://raw.githubusercontent.com/MansMeg/DIK_analys/master/Classification/Intressegrupper.csv"
   }
-  class_table <- suppressMessages(repmis::source_data(url = class_url, fileEncoding="cp1252", stringsAsFactors=FALSE))
+  class_table <- suppressMessages(repmis::source_data(url = class_url, stringsAsFactors = FALSE))
+  class_table[,2] <- tolower(class_table[,2])
+  names(class_table)[2] <- "label"
   
-  lev <- stringr::str_trim(levels(x))
-  names(lev) <- lev
-  logi <- tolower(class_table[,2]) %in% tolower(lev)
-  lev[class_table[logi,2]] <- class_table[logi,1]
-
-  not_in_class <- !tolower(lev) %in% tolower(class_table[,2])
+  add_label_df <- data.frame(rowno=1:length(levels(x)), label = tolower(stringr::str_trim(levels(x))), stringsAsFactors = FALSE)
+  add_label_df <- merge(add_label_df, class_table, all.x = TRUE)
+  not_in_class <- is.na(add_label_df[,3])
+  
   if(any(not_in_class)) {
     warning("The following classes has not been classified:\n'",
-            paste(lev[not_in_class], collapse="'\n'"), "'")
-    lev[not_in_class] <- "NOT CLASSIFIED"
+            paste(add_label_df$label[not_in_class], collapse="'\n'"), "'")
+    add_label_df[not_in_class, 3] <- "NOT CLASSIFIED"
   }
-  levels(x) <- lev
+  levels(x) <- add_label_df[order(add_label_df$rowno), 3]
   factor(as.character(x))
 }
+
 
 
 write_unemp_stat <- function(path){

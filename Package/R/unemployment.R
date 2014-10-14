@@ -49,14 +49,22 @@ read_AEA_file <- function(file_path){
 #' Check if x has class AEA_data
 #' 
 #' @param x object to check.
+#' @param class_name check for this class
 #' 
 #' @description
 #' Test if x is an object of class AEA_data, otherwise generates warning.
 #' 
 #' 
-check_AEA_class <- function(x){
-  if(!"AEA_data" %in% class(x)) warning("Data not read with read_AEA_files()", call. = FALSE)
+check_class <- function(x, class_name){
+  if(!class_name %in% class(x)) {
+    if(class_name == "AEA_data") {
+      warning("Data not read with read_AEA_files()", call. = FALSE)
+    } else {
+      warning("Object not of class ", class_name, call. = FALSE)      
+    }
+  }
 }
+
 
 #' @title
 #' Calculate all statistics
@@ -69,8 +77,8 @@ check_AEA_class <- function(x){
 #' 
 #' @export
 #' 
-calc_stat <- function(AEA_data){
-  check_AEA_class(AEA_data)
+calc_dik_stat <- function(AEA_data){
+  check_class(AEA_data, "AEA_data")
 
   dik_stat <- list()  
   dik_stat[["Month"]] <- as.character(AEA_data$manad[1])
@@ -78,41 +86,44 @@ calc_stat <- function(AEA_data){
   # Medlemmar i AEA
   dik_stat[["Medlemmar_ej_65_ar_fyllda"]] <- 
     calc_member_aea_stat(AEA_data[AEA_data$alder < 65, ])
-  dik_stat[["Medlemmar_ej_65_ar_fyllda_som_ej_studerar"]] <- 
+  dik_stat[["Medlemmar_ej_65_ar_fyllda_ej_stud"]] <- 
     calc_member_aea_stat(AEA_data = AEA_data[AEA_data$alder < 65 & AEA_data$stat1 != "Studerande", ])
   
   # Ersättningstagare
   # Remove nonmembers of AEA
-  AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$stat1 != "Studerande" & AEA_data$avisering %in% c("Direkt", "Förbund"), ]
   dik_stat[["Ers_aktstod_anststod"]] <-
+    calc_ers_stat(AEA_data[AEA_data$alder < 65 & AEA_data$avisering %in% c("Direkt", "Förbund"), ])
+  AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$stat1 != "Studerande" & AEA_data$avisering %in% c("Direkt", "Förbund"), ]
+  dik_stat[["Ers_aktstod_anststod_ej_stud"]] <-
     calc_ers_stat(AEA_member_data)
 
   arbmark <- calc_arbmarkn_stat(AEA_data)
-  dik_stat[["Arbetsmarknadspolitiska_program_1"]] <-  
+  dik_stat[["Arbetsmarknadspolitiska_program_1_ej_stud"]] <-  
     arbmark[[1]]
-  dik_stat[["Arbetsmarknadspolitiska_program_2"]] <-  
+  dik_stat[["Arbetsmarknadspolitiska_program_2_ej_stud"]] <-  
     arbmark[[2]]
   
-  dik_stat[["Ers_efter_kon_Man"]] <-
+  dik_stat[["Ers_efter_kon_Man_ej_stud"]] <-
     calc_ers_stat(AEA_member_data[AEA_member_data$kon == "M", ])
-  dik_stat[["Ers_efter_kon_Kvinna"]] <-
+  dik_stat[["Ers_efter_kon_Kvinna_ej_stud"]] <-
     calc_ers_stat(AEA_member_data[AEA_member_data$kon == "K", ])
-  dik_stat[["Ers_efter_lan"]] <-
+  dik_stat[["Ers_efter_lan_ej_stud"]] <-
     do.call(rbind, lapply(split(x = AEA_member_data, AEA_member_data$lan), calc_ers_stat))
   
   age_cat <- cut(AEA_member_data$alder,breaks = c(0, seq(25, 65, by = 5)), right = FALSE)
   levels(age_cat) <- 
     c("< 25", paste(seq(25,60,5), seq(29,64,5), sep = "-"))
-  dik_stat[["Ers_efter_alder"]] <-
+  dik_stat[["Ers_efter_alder_ej_stud"]] <-
     do.call(rbind, lapply(split(x = AEA_member_data, age_cat), calc_ers_stat))
   
-  dik_stat[["Ers_efter_Intrgr"]] <-
+  dik_stat[["Ers_efter_Intrgr_ej_stud"]] <-
     do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(x = AEA_member_data$stat4, type = "intressegrupp")), calc_ers_stat))
-  dik_stat[["Ers_efter_Utbgr"]] <-
+  dik_stat[["Ers_efter_Utbgr_ej_stud"]] <-
     do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(AEA_member_data$stat3, "utbildningsgrupp")), calc_ers_stat))  
-  dik_stat[["Ers_efter_UtbNiv"]] <-
+  dik_stat[["Ers_efter_UtbNiv_ej_stud"]] <-
     do.call(rbind, lapply(split(x = AEA_member_data, AEA_member_data$stat2), calc_ers_stat))  
 
+  class(dik_stat) <- c("dik_stat", "list")
   return(dik_stat)
 }
 
@@ -125,11 +136,9 @@ calc_stat <- function(AEA_data){
 #' @description
 #' Calculates labor force program statistics
 #' 
-#' @export
-#' 
 calc_arbmarkn_stat <- function(AEA_data){
   
-  arbmark <- table(AEA_member_data$utbprogram)
+  arbmark <- table(AEA_data$utbprogram)
 
   arb_program1 <-
     data.frame(program = names(arbmark), antal = as.vector(arbmark))[-1, ,drop=FALSE]
@@ -162,8 +171,6 @@ calc_arbmarkn_stat <- function(AEA_data){
 #' @description
 #' Calculate membership statistics
 #' 
-#' @export
-#' 
 calc_member_aea_stat <- function(AEA_data){
 
   av <- table(AEA_data$avisering)
@@ -187,8 +194,6 @@ calc_member_aea_stat <- function(AEA_data){
 #' 
 #' @description
 #' Calculate allowance statistics for the whole data.
-#' 
-#' @export
 #' 
 calc_ers_stat <- function(AEA_data){
 
@@ -245,11 +250,22 @@ dik_classify <- function(x, type = c("utbildningsgrupp", "intressegrupp")){
 
 
 
-write_dik_stat <- function(dik_stat){
-  
-}
-
-
-create_unemp_plots <- function(AEA_dataframe){
-  
+#' @title
+#' Write statistics to csv-files
+#' 
+#' @param dik_stat A dik_stat object calculated with \code{calc_dik_stat}.
+#' 
+#' @description
+#' Writes all statistics in a dik_stat object to different csv-files.
+#' 
+#' @export
+write_dik_stat <- function(dik_stat, results_path){
+  check_class(dik_stat, "dik_stat")
+  month <- dik_stat$Month
+  dik_stat$Month <- NULL
+  for(i in seq_along(dik_stat)){
+    to_write <- data.frame(month = rep(month, nrow(dik_stat[[i]])))
+    to_write <- cbind(to_write, dik_stat[[i]])
+    write.csv2(to_write, paste0(results_path, names(dik_stat)[i], ".csv"), row.names=FALSE)
+  }  
 }

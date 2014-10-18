@@ -259,7 +259,7 @@ dik_classify <- function(x, type = c("utbildningsgrupp", "intressegrupp")){
 #' Writes all statistics in a dik_stat object to different csv-files.
 #' 
 #' @export
-write_dik_stat <- function(dik_stat, results_path){
+write_dik_stat_csv <- function(dik_stat, results_path){
   check_class(dik_stat, "dik_stat")
   month <- dik_stat$Month
   dik_stat$Month <- NULL

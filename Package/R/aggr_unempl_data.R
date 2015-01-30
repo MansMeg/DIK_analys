@@ -8,7 +8,6 @@
 #' Calculates all statistics of interest and store it as list ready to append to data files.
 #' 
 #' @export
-#' 
 aggr_unempl_data <- function(AEA_data){
   check_class(AEA_data, "AEA_data")
 

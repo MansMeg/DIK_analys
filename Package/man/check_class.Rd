@@ -4,13 +4,21 @@
 \title{Check if x has class AEA_data}
 \usage{
 check_class(x, class_name)
+
+check_class(x, class_name)
 }
 \arguments{
 \item{x}{object to check.}
 
 \item{class_name}{check for this class}
+
+\item{x}{object to check.}
+
+\item{class_name}{check for this class}
 }
 \description{
+Test if x is an object of class AEA_data, otherwise generates warning.
+
 Test if x is an object of class AEA_data, otherwise generates warning.
 }
 

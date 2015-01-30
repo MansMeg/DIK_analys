@@ -42,3 +42,24 @@ read_AEA_file <- function(file_path){
   
   return(AEAdf)
 }
+
+
+#' @title
+#' Check if x has class AEA_data
+#' 
+#' @param x object to check.
+#' @param class_name check for this class
+#' 
+#' @description
+#' Test if x is an object of class AEA_data, otherwise generates warning.
+#' 
+#' 
+check_class <- function(x, class_name){
+  if(!class_name %in% class(x)) {
+    if(class_name == "AEA_data") {
+      warning("Data not read with read_AEA_files()", call. = FALSE)
+    } else {
+      warning("Object not of class ", class_name, call. = FALSE)      
+    }
+  }
+}

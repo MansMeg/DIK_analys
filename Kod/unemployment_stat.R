@@ -12,7 +12,7 @@ result_path <- "/Users/manma97/Desktop/"
 AEA_data <- DIK::read_AEA_file(file_path)
 
 # Gör beräkningar/producera statistik
-dik_stat <- aggr_unempl_data(AEA_data) # Add DIK::
+dik_stat <- DIK::aggr_unempl_data(AEA_data)
 
 # Add to stats database
-write_dik_stat_csv(dik_stat, db_path = "Data/")
+DIK::write_dik_stat_csv(dik_stat, db_path = "Data/")

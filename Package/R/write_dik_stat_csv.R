@@ -15,15 +15,14 @@ write_dik_stat_csv <- function(dik_stat, db_path){
   
   for(i in seq_along(dik_stat)[-1]){ 
     temp_df <- read.csv(paste0(db_path,names(dik_stat)[i]))
+    to_keep <- !(temp_df$year %in% yearmonth$year & temp_df$month %in% yearmonth$month)
+    temp_df <- temp_df[to_keep,]
     temp_df <- rbind(temp_df, cbind(yearmonth[rep(1,nrow(dik_stat[[i]])),], dik_stat[[i]]))
+    temp_df <- temp_df[order(temp_df$year, dik_month_strings_to_factor(x = temp_df$month)),]    
     rownames(temp_df) <- NULL
-    temp_df <- temp_df[order(temp_df$year, dik_month_strings_to_factor(x = temp_df$month)),]
-    temp_df <- temp_df[!duplicated(temp_df),]
     write.csv(temp_df, paste0(db_path, names(dik_stat)[i]), row.names=FALSE)
   }  
 }
-head(temp_df)
-
 
 
 dik_month_to_strings <- function(x){

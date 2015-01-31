@@ -27,13 +27,13 @@ aggr_unempl_data <- function(AEA_data){
   # Ersättningstagare
   
   # Remove nonmembers of AEA
-  dik_stat[["ers.csv"]] <-
-    calc_ers_stat(AEA_data[AEA_data$alder < 65 & AEA_data$avisering %in% c("Direkt", "Förbund"), ])[c(2,4,8)]
-  names(dik_stat[["ers.csv"]]) <- c("ers_tagare","akt_stod","anst_m_stod")
+  #dik_stat[["ers.csv"]] <-
+  #  calc_ers_stat(AEA_data[AEA_data$alder < 65 & AEA_data$avisering %in% c("Direkt", "Förbund"), ])[c(2,4,8)]
+  #names(dik_stat[["ers.csv"]]) <- c("ers_tagare","akt_stod","anst_m_stod")
   AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$stat1 != "Studerande" & AEA_data$avisering %in% c("Direkt", "Förbund"), ]
   dik_stat[["ers_ej_stud.csv"]] <-
     calc_ers_stat(AEA_member_data)[c(2,4,8)]
-  names(dik_stat[["ers.csv"]]) <- c("ers_tagare","akt_stod","anst_m_stod")
+  names(dik_stat[["ers_ej_stud.csv"]]) <- c("ers_tagare","akt_stod","anst_m_stod")
   
   arbmark <- calc_arbmarkn_stat(AEA_data)
   dik_stat[["arb_prgm_a.csv"]] <-  
@@ -42,7 +42,7 @@ aggr_unempl_data <- function(AEA_data){
   
   dik_stat[["arb_prgm_b.csv"]] <-  
     arbmark[[2]]
-  colnames(arbmark[[2]]) <- 
+  colnames(dik_stat[["arb_prgm_b.csv"]]) <- 
     c("antal","prgm_utan_ers","akt_stod","ers_tagare_i_akt_stod","anst_m_stod","jug","fas3","ovriga")
 
   # Ers. by sex
@@ -68,7 +68,7 @@ aggr_unempl_data <- function(AEA_data){
   levels(age_cat) <- 
     c("< 25", paste(seq(25,60,5), seq(29,64,5), sep = "-"))
   ages <-
-    do.call(rbind, lapply(split(x = AEA_member_data, age_cat), calc_ers_stat))
+    do.call(rbind, lapply(split(x = AEA_member_data, age_cat), calc_ers_stat))[,c(1,2,4,8)]
   ages <- cbind(rownames(ages), ages)
   colnames(ages) <- c("age_group","antal","ers_tagare","akt_stod","anst_m_stod")
   rownames(ages) <- NULL
@@ -80,7 +80,7 @@ aggr_unempl_data <- function(AEA_data){
   intr_group <- cbind(rownames(intr_group), intr_group[,c(1,2,4,8)])
   colnames(intr_group) <- c("intressegrupp","antal","ers_tagare","akt_stod","anst_m_stod")
   rownames(intr_group) <- NULL
-  dik_stat[["ers_by_intrest_group.csv"]] <- intr_group
+  dik_stat[["ers_by_interest_group.csv"]] <- intr_group
   
   # Utb.inriktning 
   utb_group <-

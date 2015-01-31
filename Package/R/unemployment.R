@@ -201,24 +201,3 @@ dik_classify <- function(x, type = c("utbildningsgrupp", "intressegrupp")){
   factor(as.character(x))
 }
 
-
-
-#' @title
-#' Write statistics to csv-files
-#' 
-#' @param dik_stat A dik_stat object calculated with \code{calc_dik_stat}.
-#' 
-#' @description
-#' Writes all statistics in a dik_stat object to different csv-files.
-#' 
-#' @export
-write_dik_stat_csv <- function(dik_stat, results_path){
-  check_class(dik_stat, "dik_stat")
-  month <- dik_stat$Month
-  dik_stat$Month <- NULL
-  for(i in seq_along(dik_stat)){
-    to_write <- data.frame(month = rep(month, nrow(dik_stat[[i]])))
-    to_write <- cbind(to_write, dik_stat[[i]])
-    write.csv2(to_write, paste0(results_path, names(dik_stat)[i], ".csv"), row.names=FALSE)
-  }  
-}

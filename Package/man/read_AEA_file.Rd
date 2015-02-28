@@ -3,10 +3,13 @@
 \alias{read_AEA_file}
 \title{Read in DIK unemployment files from AEA}
 \usage{
-read_AEA_file(file_path)
+read_AEA_file(file_path, stat_var = NULL)
 }
 \arguments{
 \item{file_path}{Path to an AEA file}
+
+\item{stat_var}{'stat' variables order in AEA file. Need to assign "anst", "utbniva", "utbgrp", "intrgrp", "sektor" in stat variable order. (see examples)
+  If NULL (default) the function tries to find it out automatically.}
 }
 \value{
 \code{data.frame} of class AEA_data.
@@ -14,5 +17,17 @@ read_AEA_file(file_path)
 \description{
 All files are read in to R and put in one data.frame, checks that the file is correct
 is conducted.
+}
+\details{
+anst : ex. Anställd, Arbetslös, Egen Företagare, Ej yrkesverksam, Föräldraledig, Pensionerad (anstallning)
+  utbniva : ex. -2 år Univ/Högskola, -5 år- Univ/Högskola, Doktorsutbildning/examen, Magister, Studerande (utbniva)
+  utbgrp : Utbildningsgrupper
+  intrgrp : Intressegrupper
+  sektor : ex. Statlig, privat, kommunal (sektor)
+}
+\examples{
+\dontrun{
+ read_AEA_file(file_path, stat_var=c("anst", "utbniva", "utbgrp", "intrgrp", "sektor"))
+}
 }
 

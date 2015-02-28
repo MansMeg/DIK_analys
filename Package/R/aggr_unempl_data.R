@@ -20,7 +20,7 @@ aggr_unempl_data <- function(AEA_data){
   names(dik_stat[["medlemmar_AEA.csv"]]) <- c("Direktaviserade_AEA","Forbundsaviserade_AEA","Medlemmar_DIK_upp_till_65")
 
   dik_stat[["medlemmar_AEA_ej_stud.csv"]] <- 
-    calc_member_aea_stat(AEA_data = AEA_data[AEA_data$alder < 65 & AEA_data$stat1 != "Studerande", ])[c(1,2,4)]
+    calc_member_aea_stat(AEA_data = AEA_data[AEA_data$alder < 65 & AEA_data$anst != "Studerande", ])[c(1,2,4)]
   names(dik_stat[["medlemmar_AEA_ej_stud.csv"]]) <- c("Direktaviserade_AEA","Forbundsaviserade_AEA","Medlemmar_DIK_upp_till_65")
 
   
@@ -30,7 +30,7 @@ aggr_unempl_data <- function(AEA_data){
   #dik_stat[["ers.csv"]] <-
   #  calc_ers_stat(AEA_data[AEA_data$alder < 65 & AEA_data$avisering %in% c("Direkt", "Förbund"), ])[c(2,4,8)]
   #names(dik_stat[["ers.csv"]]) <- c("ers_tagare","akt_stod","anst_m_stod")
-  AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$stat1 != "Studerande" & AEA_data$avisering %in% c("Direkt", "Förbund"), ]
+  AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$anst != "Studerande" & AEA_data$avisering %in% c("Direkt", "Förbund"), ]
   dik_stat[["ers_ej_stud.csv"]] <-
     calc_ers_stat(AEA_member_data)[c(2,4,8)]
   names(dik_stat[["ers_ej_stud.csv"]]) <- c("ers_tagare","akt_stod","anst_m_stod")
@@ -76,7 +76,7 @@ aggr_unempl_data <- function(AEA_data){
 
   # Intrest group
   intr_group <-
-    do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(x = AEA_member_data$stat4, type = "intressegrupp")), calc_ers_stat))
+    do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(x = AEA_member_data$intrgrp, type = "intressegrupp")), calc_ers_stat))
   intr_group <- cbind(rownames(intr_group), intr_group[,c(1,2,4,8)])
   colnames(intr_group) <- c("intressegrupp","antal","ers_tagare","akt_stod","anst_m_stod")
   rownames(intr_group) <- NULL
@@ -84,7 +84,7 @@ aggr_unempl_data <- function(AEA_data){
   
   # Utb.inriktning 
   utb_group <-
-    do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(AEA_member_data$stat3, "utbildningsgrupp")), calc_ers_stat))  
+    do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(AEA_member_data$utbgrp, "utbildningsgrupp")), calc_ers_stat))  
   utb_group <- cbind(rownames(utb_group), utb_group[,c(1,2,4,8)])
   colnames(utb_group) <- c("utb_grupp","antal","ers_tagare","akt_stod","anst_m_stod")
   rownames(utb_group) <- NULL
@@ -92,7 +92,7 @@ aggr_unempl_data <- function(AEA_data){
   
   # Utb.inriktning 
   utb_niv <-
-    do.call(rbind, lapply(split(x = AEA_member_data, AEA_member_data$stat2), calc_ers_stat))  
+    do.call(rbind, lapply(split(x = AEA_member_data, AEA_member_data$utbniva), calc_ers_stat))  
   utb_niv <- cbind(rownames(utb_niv), utb_niv[,c(1,2,4,8)])
   colnames(utb_niv) <- c("utb_niva","antal","ers_tagare","akt_stod","anst_m_stod")
   rownames(utb_niv) <- NULL

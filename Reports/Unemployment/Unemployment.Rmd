@@ -1,0 +1,477 @@
+---
+title: "Arbetslöshet"
+author: "Lisa Gemmel"
+date: "28 februari 2015"
+output: word_document
+---
+
+```{r, echo=FALSE}
+# Parameters
+month <- "December"
+year <- "2014"
+comp_month <- month
+comp_year <- "2013"
+path <- "/Users/manma97/Dropbox/projekt/DIK_analys" # getwd()
+figures <- paste0("Unempl_plot")
+
+knitr::opts_chunk$set(echo=FALSE)
+```
+
+```{r}
+# Load libraries
+library(DIK)
+library(ggplot2)
+library(lubridate)
+
+# Read in database
+files <- dir(paste0(path, "/Data"))
+files <- files[stringr::str_detect(string = files,pattern =  ".csv")]
+for(file in files){
+  assign(x=stringr::str_split(file, pattern = "\\.")[[1]][1], 
+         read.csv(paste0(path, "/Data/", file)))
+}
+
+## medlemmar_AEA_ej_stud
+medlemmar_AEA_ej_stud$AEA_percent_of_DIK <- 100 *
+  (medlemmar_AEA_ej_stud$Direktaviserade_AEA + 
+   medlemmar_AEA_ej_stud$Forbundsaviserade_AEA) /
+   medlemmar_AEA_ej_stud$Medlemmar_DIK_upp_till_65
+medlemmar_AEA_ej_stud$date <- to_date(medlemmar_AEA_ej_stud$year, medlemmar_AEA_ej_stud$month)
+
+## ers_ej_stud
+ers_ej_stud$date <- to_date(ers_ej_stud$year,ers_ej_stud$month)
+
+## ers_by_sex
+ers_by_sex$date <- to_date(ers_by_sex$year, ers_by_sex$month)
+ers_by_sex$unemp_tot_M <- 100 * (ers_by_sex$ers_tagare_M + ers_by_sex$akt_stod_M) / ers_by_sex$AEA_ansl_M
+ers_by_sex$unemp_tot_K <- 100 * (ers_by_sex$ers_tagare_K + ers_by_sex$akt_stod_K) / ers_by_sex$AEA_ansl_K
+ers_by_sex$unemp_ers_M <- 100 * ers_by_sex$ers_tagare_M / ers_by_sex$AEA_ansl_M
+ers_by_sex$unemp_ers_K <- 100 * ers_by_sex$ers_tagare_K / ers_by_sex$AEA_ansl_K
+ers_by_sex$unemp_akt_M <- 100 * ers_by_sex$akt_stod_M / ers_by_sex$AEA_ansl_M
+ers_by_sex$unemp_akt_K <- 100 * ers_by_sex$akt_stod_K / ers_by_sex$AEA_ansl_K
+ers_by_sex$unemp_anst_M <- 100 * ers_by_sex$anst_m_stod_M / ers_by_sex$AEA_ansl_M
+ers_by_sex$unemp_anst_K <- 100 * ers_by_sex$anst_m_stod_K / ers_by_sex$AEA_ansl_K
+
+## ers_AEA
+ers_AEA$date <- to_date(ers_AEA$year,ers_AEA$month)
+ers_AEA$unemp_tot <- ers_AEA$ers_tagare_p + ers_AEA$akt_stod_p
+
+## ers_by_county
+ers_by_county$date <- to_date(ers_by_county$year,ers_by_county$month)
+ers_by_county$unemp_tot <- 100 * (ers_by_county$ers_tagare + ers_by_county$akt_stod) / ers_by_county$antal
+
+## ers_by_age
+ers_by_age$date <- to_date(ers_by_age$year, ers_by_age$month)
+ers_by_age$unemp_tot <- 100 * (ers_by_age$ers_tagare + ers_by_age$akt_stod) / ers_by_age$antal
+ers_by_age$unemp_akt <- 100 * ers_by_age$akt_stod / ers_by_age$antal
+ers_by_age$unemp_ers <- 100 * ers_by_age$ers_tagare / ers_by_age$antal
+ers_by_age$unemp_anst <- 100 * ers_by_age$anst_m_stod / ers_by_age$antal
+
+## ers_by_utb
+ers_by_education$date <- to_date(ers_by_education$year, ers_by_education$month)
+ers_by_education$unemp_tot <- 100 * (ers_by_education$ers_tagare + ers_by_education$akt_stod) / ers_by_education$antal
+ers_by_education$unemp_akt <- 100 * ers_by_education$akt_stod / ers_by_education$antal
+ers_by_education$unemp_ers <- 100 * ers_by_education$ers_tagare / ers_by_education$antal
+ers_by_education$unemp_anst <- 100 * ers_by_education$anst_m_stod / ers_by_education$antal
+
+
+# New datasets
+## unempl_data 
+unempl_data <- merge(medlemmar_AEA_ej_stud, ers_ej_stud[,-c(1:2)], by = "date")
+unempl_data$AEA_tot <- unempl_data$Direktaviserade_AEA + unempl_data$Forbundsaviserade_AEA
+unempl_data$unemp_tot <- 100 * (unempl_data$ers_tagare + unempl_data$akt_stod) / unempl_data$AEA_tot
+unempl_data$unemp_ers <- 100 * unempl_data$ers_tagare / unempl_data$AEA_tot
+unempl_data$unemp_akt <- 100 * unempl_data$akt_stod / unempl_data$AEA_tot
+unempl_data$unemp_anst <- 100 * unempl_data$anst_m_stod / unempl_data$AEA_tot
+
+## unempl_data_last12
+# Choose the last 12 month and save as new dataset
+unempl_data_last12 <- unempl_data[(nrow(unempl_data)-12):nrow(unempl_data), ]
+
+## arb_mrk_prgm
+prt1 <- arb_prgm_a[tolower(arb_prgm_a$month) == tolower(month) & arb_prgm_a$year == as.numeric(year),3:4]
+prt2 <- arb_prgm_a[tolower(arb_prgm_a$month) == tolower(comp_month) & arb_prgm_a$year == as.numeric(comp_year),3:4]
+names(prt1)[2] <- paste(month, year) 
+names(prt2)[2] <- paste(comp_month, comp_year)
+arb_mrk_prgm <- merge(prt1,prt2, by="arb_mark_prgm")
+names(arb_mrk_prgm)[1] <- "Program"
+
+## Bar plot data
+sex_bar_plot <- ers_by_sex[ers_by_sex$month == tolower(month) & ers_by_sex$year == as.numeric(year),]
+sex_bar_plot <- unlist(unclass(sex_bar_plot[c("unemp_anst_M", "unemp_akt_M", "unemp_ers_M","unemp_anst_K", "unemp_akt_K", "unemp_ers_K")]))
+sex_bar_plot <- data.frame(anst=rep(c("Anställning m. stöd", "Aktivitetsersättning", "Ersättningstagare"),2), 
+                 sex=c(rep("Män",3),rep( "Kvinnor",3)), 
+                 val= sex_bar_plot)
+
+region_bar_plot <- ers_by_county[ers_by_county$month == tolower(month) & ers_by_county$year == as.numeric(year),]
+
+### age_bar_plots
+age_bar_plot1 <- ers_by_age[ers_by_age$month == tolower(month) & ers_by_age$year == as.numeric(year),]
+age_bar_plot_tmp1 <- age_bar_plot1[,c("age_group", "unemp_akt")]
+age_bar_plot_tmp1$type <- "Aktivitetsersättning"
+colnames(age_bar_plot_tmp1)[2] <- "value"
+age_bar_plot_tmp2 <- age_bar_plot1[,c("age_group", "unemp_ers")]
+age_bar_plot_tmp2$type <- "Ersättningstagare"
+colnames(age_bar_plot_tmp2)[2] <- "value"
+age_bar_plot_tmp3 <- age_bar_plot1[,c("age_group", "unemp_anst")]
+age_bar_plot_tmp3$type <- "Anställning m. stöd"
+colnames(age_bar_plot_tmp3)[2] <- "value"
+age_bar_plot1 <- rbind(age_bar_plot_tmp1,age_bar_plot_tmp2,age_bar_plot_tmp3)
+
+age_bar_plot2 <- ers_by_age[(ers_by_age$month == tolower(month) & ers_by_age$year == as.numeric(year)) |
+                            (ers_by_age$month == tolower(comp_month) & ers_by_age$year == as.numeric(comp_year)),]
+
+### utb_bar_plots
+utb_bar_plot0 <- utb_bar_plot1 <- ers_by_education[ers_by_education$month == tolower(month) & ers_by_education$year == as.numeric(year),]
+utb_bar_plot_tmp1 <- utb_bar_plot1[,c("utb_grupp", "unemp_akt")]
+utb_bar_plot_tmp1$type <- "Aktivitetsersättning"
+colnames(utb_bar_plot_tmp1)[2] <- "value"
+utb_bar_plot_tmp2 <- utb_bar_plot1[,c("utb_grupp", "unemp_ers")]
+utb_bar_plot_tmp2$type <- "Ersättningstagare"
+colnames(utb_bar_plot_tmp2)[2] <- "value"
+utb_bar_plot_tmp3 <- utb_bar_plot1[,c("utb_grupp", "unemp_anst")]
+utb_bar_plot_tmp3$type <- "Anställning m. stöd"
+colnames(utb_bar_plot_tmp3)[2] <- "value"
+utb_bar_plot1 <- rbind(utb_bar_plot_tmp1,utb_bar_plot_tmp2,utb_bar_plot_tmp3)
+
+utb_bar_plot2 <- ers_by_education[(ers_by_education$month == tolower(month) & ers_by_education$year == as.numeric(year)) |
+                            (ers_by_education$month == tolower(comp_month) & ers_by_education$year == as.numeric(comp_year)),]
+
+# Plot number
+i <- 1
+```
+
+
+# `r month` `r year`
+
+Under första kvartalet 2014 var andelen arbetssökande något lägre än vad det var under första kvartalet 2013. Arbetslösheten låg i `r tolower(month)` på `r ` procent. Av dessa fick 2,69 procent a-kassa och 1,32 procent deltog i program hos arbetsförmedlingen. Ytterligare 1,38 procent hade en anställning med stöd.
+
+Andelen AEA-anslutna DIK-medlemmar ligger på en stabil och hög nivå. Drygt nio av tio är anslutna till AEA och andelen som väljer att betala sin avgift direkt till AEA istället för att betala via DIK växer sakta, i `r tolower(month)` `r year` låg den på 8,3 procent. Mellan juli och september har andelen AEA-anslutna legat strax under 95 procent.
+
+## Arbetslöshetsmåttet som används i rapporten
+
+Individerna som förekommer i rapporten kan delas upp i tre grupper;
+
+1. Fått a-kasseersättning 
+2. Fått aktivitetsstöd och deltagit i program hos Arbetsförmedlingen
+3. Har en anställning med stöd
+
+Gruppen som benäms som ’arbetssökande’ utgörs av grupp 1 och 2. Det är individer som fått ersättning från a-kassan den aktuella månaden samt de individer som var inskrivna i ett program hos arbetsförmedlingen och därigenom fått aktivitetsersättning. Grupp 3 har i olika grad en osäker ställning på arbetsmarknaden. De är alltså inte att betrakta som arbetssökande men kan inte heller anses vara stabilt etablerade på arbetsmarknaden.
+
+I de fall en individ både fått ersättning från a-kassan och fått aktivitetsersättning under samma månad räknas individen enbart en gång.
+
+## Oförändrad andel AEA-anslutna
+
+Mellan januari och mars har andelen AEA-anslutna medlemmar legat relativt stilla. 
+Andelen som betalar sitt AEA-medlemskap direkt till AEA istället för via DIK fortsätter att öka sakta och är nu uppe i 8,3 procent.
+
+```{r}
+plt <-
+  ggplot(data=medlemmar_AEA_ej_stud, aes(x=date, y=AEA_percent_of_DIK)) + 
+    geom_line(color="red") +
+    ylim(c(70,100)) + xlab("") + ylab("Procent (%)") + 
+    ggtitle(expression(atop("Andel AEA-medlemmar", atop("Studenter exkluderade"), "")))
+
+suppressWarnings(print(plt))
+
+# Save plot
+ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
+cat(paste0(figures,i, ".eps"))
+i <- i + 1
+```
+
+Andelen AEA-anslutna har legat stilla kring 95 procent under hela mätperioden.
+
+## Oförändrad arbetslöshet senaste kvartalet
+
+### Andel med ersättning och med aktivitetsersättning
+
+Andelen arbetssökande ligger i det närmaste oförändrat i under årets tre första månader. I `r tolower(month)` `r year` fick 4,01 procent ersättning från a-kassan eller deltog i program hos Arbetsförmedlingen. Arbetslösheten låg något lägre det första kvartalet 2014 än vad den gjorde samma period 2013. 
+
+```{r}
+plt <-
+  ggplot(data=unempl_data, aes(x=date, y=unemp_tot)) + 
+    geom_line(color="red") +
+    ylim(c(0,5)) + 
+    xlab("") + ylab("Procent (%)") + 
+    ggtitle(expression(atop("Arbetslöshetens utveckling", atop("Ersättningstagare och aktivitetsersättning"), "")))
+
+suppressWarnings(print(plt))
+
+# Save plot
+ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
+cat(paste0(figures,i, ".eps"))
+i <- i + 1
+
+```
+
+### Arbetslösheten i DIK jämfört med i AEA
+När andelen arbetssökande i DIK jämförs med hela AEA låg DIK i `r tolower(month)` `r year` 1,9 procentenheter högre.
+
+```{r}
+plt <-
+  ggplot(data=unempl_data, aes(x=date, y=unemp_tot)) + 
+    geom_line(aes(color="DIK")) +
+    ylim(c(0,5)) + 
+    xlab("") + ylab("Procent (%)") + 
+    ggtitle("A-kassa och aktivitetsstöd") +
+    theme(legend.position="top") +
+    geom_line(data = ers_AEA, aes(x=date, y=unemp_tot, color="AEA")) +
+    scale_colour_manual("", breaks = c("AEA", "DIK"),
+                        values = c("black", "red"))
+suppressWarnings(print(plt))
+
+# Save plot
+ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
+cat(paste0(figures,i, ".eps"))
+i <- i + 1
+```
+
+
+## Utveckling de senaste 12 månaderna
+
+Under de senaste 12 månaderna har andelen arbetssökande legat runt fyra procent. Lägst andel arbetssökande kan ses i juni, 3,58 procent, och i november, 3,65 procent.
+Det senaste kvartalet har andelen arbetssökande legat stilla runt fyra procent. 
+
+```{r}
+plt <-
+  ggplot(data=unempl_data_last12, aes(x=date)) + 
+    geom_line(aes(y=unemp_ers, color="Ersättning")) +
+    geom_line(aes(y=unemp_akt, color="Aktivitetsstöd")) +
+    geom_line(aes(y=unemp_anst, color="Anställning m. stöd")) +
+    ylim(c(0,4)) + 
+    xlab("") + ylab("Procent (%)") + 
+    ggtitle("A-kassa och aktivitetsstöd") +
+    theme(legend.position="top") +
+    scale_colour_manual("", breaks = c("Ersättning", "Aktivitetsstöd", "Anställning m. stöd"),
+                        values = c("black", "darkgrey", "red"))
+
+suppressWarnings(print(plt))
+# Save plot
+ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
+cat(paste0(figures,i, ".eps"))
+i <- i + 1
+```
+
+
+## Andelen med ersättning från AEA 
+
+Andelen arbetssökande med ersättning från AEA har ökat legat stilla runt 2,7 procent senaste kvartalet. I `r tolower(month)` fick 2,69 procent ersättning från a-AEA. I jämförelse med samma månad ett år tillbaka har andelen ersättningstagare minskat med 0,11 procentenheter.
+
+```{r}
+plt <-
+  ggplot(data=unempl_data, aes(x=date, y=unemp_ers)) + 
+    geom_line(aes(color="DIK")) +
+    ylim(c(0,4)) + 
+    xlab("") + ylab("Procent (%)") + 
+    ggtitle("A-kassa och aktivitetsstöd") +
+    geom_line(data = ers_AEA, aes(x=date, y=ers_tagare_p, color="AEA")) +
+    theme(legend.position="top") +
+    scale_colour_manual("", breaks = c("AEA", "DIK"),
+                        values = c("black", "red"))
+suppressWarnings(print(plt))
+
+# Save plot
+ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
+cat(paste0(figures,i, ".eps"))
+i <- i + 1
+```
+
+
+## I program hos Arbetsförmedlingen
+
+Antalet i program hos Arbetsförmedlingen har minskat jämfört med ett år tillbaka och var i `r tolower(month)` `r year` 238 personer. Det motsvarar 1,32 procent, att jämföra med 1,4 procent i `r tolower(comp_month)` `r comp_year`. Den vanligaste programaktiviteten för DIK-medlemmar är Jobb och utvecklingsgarantin. Antalet i FAS 3 är oförändrat jämfört med ett år tillbaka.
+
+```{r, results='asis'}
+knitr::kable(arb_mrk_prgm)
+```
+
+### Anställningsstöd
+Antalet medlemmar som fått en anställning med stöd har ökat jämfört med ett år tillbaka. Den sedan tidigare vanligaste anställningsformen, nystartsjobb, har ökat ytterligare och i `r tolower(month)` `r year` hade 92 medlemmar en sådan anställning. 
+I `r tolower(month)` `r year` hade 1,38 procent en anställning med stöd.
+
+## Arbetslöshet och kön
+### Utveckling per kön 
+Andelen arbetssökande i gruppen män ligger högre än vad den gör för gruppen kvinnor. Andelen arbetssökande män var 4,66 procent och andelen kvinnor var 3,82 procent. 
+I jämförelse med ett år tillbaka så har andelen arbetssökande kvinnor ökat svagt med 0,08 procentenheter. Andelen arbetssökande män ökade med 0,23 procentenheter.
+
+
+```{r}
+plt <-
+  ggplot(data=ers_by_sex, aes(x=date)) + 
+    geom_line(aes(y=unemp_tot_M, color="Män")) +
+    geom_line(aes(y=unemp_tot_K, color="Kvinnor")) +
+    ylim(c(0,8)) + 
+    xlab("") + ylab("Procent (%)") + 
+    ggtitle("A-kassa och aktivitetsstöd") +
+    theme(legend.position="top") +
+    scale_colour_manual("", breaks = c("Män", "Kvinnor"),
+                        values = c("black", "red"))
+
+suppressWarnings(print(plt))
+
+# Save plot
+ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
+cat(paste0(figures,i, ".eps"))
+i <- i + 1
+```
+
+### Jämförelse mellan kvinnor och män i `r tolower(month)` `r year`
+Kvinnor och män har i ungefär lika stor utsträckning ersättning från a-kassan, 2,7 procent respektive 2,6 procent. Mäns högre andel arbetssökande förklaras helt med att de i större utsträckning deltar i program hos arbetsförmedlingen, 2,1 procent för män och 1,1 procent för kvinnor. I gruppen män har även en större andel ett arbete med stöd, 2,3 procent i jämförelse med 1,1 procent bland kvinnorna.
+
+```{r}
+plt <- 
+  ggplot(data=sex_bar_plot, aes(x=sex, y=val, fill=anst)) + 
+    geom_bar(stat="identity", position=position_dodge()) +
+    scale_fill_manual(values=c("black", "darkgray", "red"), name="") +
+    xlab("") + ylab("Procent (%)") + 
+    ggtitle(expression(atop("A-kassa och aktivitetsstöd", atop("efter kön"), "")))
+
+suppressWarnings(print(plt))
+
+# Save plot
+ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
+cat(paste0(figures,i, ".eps"))
+i <- i + 1
+```
+
+
+## Arbetslöshet och region/län
+
+Sex av tio DIK-medlemmar under 65 år bor i de tre storstadsregionerna Stockholm, Skåne och Västra Götaland. Lägger man även till Uppsala och Östergötland täcks hela sju av tio medlemmar in. Andelen ersättnings- och programdeltagare i län med få medlemmar ska läsas med försiktighet. Ett fåtal personer som går från eller till arbete får ett stort utslag på andelstalen.
+
+```{r}
+val <- 100 * sum(region_bar_plot$ers_tagare + region_bar_plot$akt_stod) / sum(region_bar_plot$antal)
+plt <- 
+  ggplot(data=region_bar_plot, aes(x=county, y=unemp_tot)) + 
+    geom_bar(stat="identity", position=position_dodge(), fill="red", name="") + 
+    coord_flip() + 
+    xlab("") + ylab("Procent (%)") + 
+    geom_hline(yintercept = val, color="black") + 
+    ggtitle(expression(atop("A-kassa och aktivitetsstöd", atop("efter region"), "")))
+
+suppressWarnings(print(plt))
+
+# Save plot
+ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 6)
+cat(paste0(figures,i, ".eps"))
+i <- i + 1
+```
+
+
+## Arbetslöshet och åldersgrupp
+Den lägsta andelen arbetssökande under `r tolower(month)` månad hittas i grupperna 35-44 år. Högst arbetslöshet ses i de äldsta och yngsta grupperna men de skiljer sig åt genom att de yngre i större utsträckning har ersättning från a-kassa och de äldre deltar i program hos Arbetsförmedlingen. Andelen som har ett arbete med stöd och som deltar i program hos Arbetsförmedlingen ökar med ålder.
+Siffrorna för gruppen under 25 år ska tolkas med försiktighet. Hela gruppen bestod i `r tolower(month)` `r year` enbart av 107 individer vilket gör att en individ som går till eller ifrån arbete får stort utslag på andelstalen.  
+
+```{r}
+plt <- 
+  ggplot(data=age_bar_plot1, aes(x=age_group, y=value, fill=type)) + 
+    geom_bar(stat="identity", position=position_dodge()) +
+    scale_fill_manual(values=c("black", "darkgray", "red"), name="") +
+    xlab("") + ylab("Procent (%)") + coord_flip() +
+    ggtitle(expression(atop("A-kassa och aktivitetsstöd", atop("efter åldersgrupp och ersättningstyp"), "")))
+
+suppressWarnings(print(plt))
+
+# Save plot
+ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
+cat(paste0(figures,i, ".eps"))
+i <- i + 1
+
+```
+
+
+### Jämförelse `r tolower(month)` `r year` och `r tolower(comp_month)` `r comp_year`
+Störst positiv förändring jämfört med ett åt tillbaka har skett för gruppen 64-69 år där andelen arbetssökande har minskat med 0,91 procentenheter. För gruppen 55-59 har en lika stor förändring skett, men i den andra riktningen. Gruppen under 25 undantagen då den består av så pass få individer för att några slutsatser inte kan dras.
+I gruppen med flest antal medlemmar, 40-44 år, har andelen arbetssökande minskat med 0,55 procentenheter.
+
+```{r}
+plt <-
+  ggplot(data=age_bar_plot2, aes(x=age_group, y=unemp_tot, fill=as.character(year))) + 
+    geom_bar(stat="identity", position=position_dodge()) +
+    scale_fill_manual(values=c("darkgray", "red"), name="") +
+    xlab("") + ylab("Procent (%)") + coord_flip() +
+    ggtitle(expression(atop("A-kassa och aktivitetsstöd", atop("efter åldersgrupp och år"), "")))
+
+suppressWarnings(print(plt))
+
+# Save plot
+ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
+cat(paste0(figures,i, ".eps"))
+i <- i + 1
+```
+
+
+## Arbetslöshet och utbildningsinriktning
+Arbetslösheten varierar stort beroende på utbildningsinriktning. Utbildade inom arkiv och dokumentation har en mycket låg arbetslöshet, tillsammans med utbildade inom logopedi och utbildade inom bibliotek och information. Arbetslösheten för dessa grupper ligger strax under genomsnittet för AEA. 
+Högst andel arbetssökande har gruppen utbildade inom arkeologi och gruppen där utbildningsuppgift saknas.
+
+```{r}
+plt <- 
+  ggplot(data=utb_bar_plot1, aes(x=utb_grupp, y=value, fill=type)) + 
+    geom_bar(stat="identity", position=position_dodge()) +
+    scale_fill_manual(values=c("black", "darkgray", "red"), name="") +
+    xlab("") + ylab("Procent (%)") + coord_flip() +
+    ggtitle("A-kassa och aktivitetsstöd") +
+    theme(legend.position="top")
+
+suppressWarnings(print(plt))
+
+# Save plot
+ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 5)
+cat(paste0(figures,i, ".eps"))
+i <- i + 1
+```
+
+
+### Jämförelse `r tolower(month)` `r year` och `r tolower(comp_month)` `r comp_year`
+
+Enbart gruppen kulturvetenskap har haft en ökad andel arbetssökande jämfört med ett år tillbaka. Ökningen i den gruppen var 1,8 procentenheter.
+Störst förändring jämfört med ett år tillbaka står utbildade inom språk för. I den gruppen har andelen arbetssökande minskat med 1,11 procent procentenheter till 2,49 procent. 
+
+
+```{r}
+plt <- 
+  ggplot(data=utb_bar_plot2, aes(x=utb_grupp, y=unemp_tot, fill=as.character(year))) + 
+    geom_bar(stat="identity", position=position_dodge()) +
+    scale_fill_manual(name="",values=c("darkgray", "red")) +
+    xlab("") + ylab("Procent (%)") + coord_flip() +
+    ggtitle("A-kassa och aktivitetsstöd") +
+    theme(legend.position="top")
+
+suppressWarnings(print(plt))
+
+# Save plot
+ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
+cat(paste0(figures,i, ".eps"))
+i <- i + 1
+```
+
+
+# Om rapporten
+Uppgifterna i denna rapport baseras på DIK-medlemmar som även är medlemmar i AEA. Alla medlemmar som är 65 år fyllda är borttagna ur underlaget då reglerna för a-kassan inte tillåter medlemskap efter 65-årsdagen. Även medlemmar som i medlemsregistret är registrerade som studerande i Sverige eller utlandet är bortrensade ur underlaget. Det är den del av medlemskåren som står till arbetsmarknadens förfogande som främst är av intresse. Mörkertal kan finnas i den grupp som inte är anslutna till AEA, bland medlemmar som kvarstår som studerande trots att de avslutat sina studier samt bland nyexaminerade som inte uppfyller kraven för att få ersättning från a-kassan.
+
+Rapporten baseras på uppgifter från DIK:s medlemsregister den sista dagen respektive månad som samkörs mot AEA:s register den första i månaden därpå.
+
+Uppgifterna tidigare än maj 2012 är ikappkört med historiska data från AEA och utdrag ur DIK:s medlemsregister i maj 2012. Därmed finns två felkällor. Individer som tillkommit i maj 2012 och som inte var medlemmar tidigare kommer ändå med i statistiken före maj 2012 och individer som utträtt i fram till april 2012 men som var medlemmar vid mättillfället kommer inte med. Förändringar som skett innan juni 2012, särskilt i de yngre åldersgrupperna, ska därför läsas med dessa felkällor i åtanke.
+
+## Om utbildningsgrupperna
+För att göra bilden av arbetslösheten i respektive utbildningsgrupp mer komplett redovisas även gruppernas respektive storlek i förbundet.
+
+```{r}
+plt <- 
+  ggplot(data=utb_bar_plot0, aes(x=utb_grupp, y=antal)) + 
+    geom_bar(stat="identity", position=position_dodge(), fill="red") +
+    xlab("") + ylab("Antal medlemmar") + coord_flip() +
+    ggtitle(expression(atop("A-kassa och aktivitetsstöd", atop("efter utbildningsgrupp"), "")))
+
+suppressWarnings(print(plt))
+
+# Save plot
+ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
+cat(paste0(figures,i, ".eps"))
+i <- i + 1
+```
+
+Utbildningsinriktningar har grupperats så ingen grupp består av minder än 500 individer och det är vad medlemmen lämnat för uppgift till medlemsregistret om sin utbildning som avgör i vilken grupp de hamnar. Samtliga AEA-ansluta medlemmar är inte med i dessa diagram då individer med registrerad utbildning som inte på ett självklart sätt passar ini någon av grupperna gallrats bort, t.ex. fysik, lärare och läkare. Totalt kvarstår 17 728 individer, inklusive gruppen där utbildningsuppgift saknas. 
+

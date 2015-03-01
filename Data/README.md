@@ -119,8 +119,8 @@ Variabel | Beskrivning |
 --- | --- |
 ```year```  | |
 ```month```  | |
-```ers_tagare_p```  | Andel ersättningstagare AEA |
-```akt_stod_p```  | Andel i aktivitetsstöd (program hos Arbetsförmedlingen) AEA |
+```ers_tagare_p```  | Andel ersättningstagare AEA (i procent) |
+```akt_stod_p```  | Andel i aktivitetsstöd (program hos Arbetsförmedlingen) AEA  (i procent) |
 
 
 ## arb_prgm_b.csv

@@ -113,7 +113,7 @@ Variabel | Beskrivning |
 ```anst_m_stod``` | Anställning med stöd |
 
 ## ers_AEA.csv
-Genomsnittlig ersättning och aktivitetsstöd i AEA. Hämtas från pdf.
+Genomsnittlig ersättning och aktivitetsstöd i AEA från samtliga medlemmar från samtliga förbund. Hämtas från AEA:s egen månadsstatstik. 
 
 Variabel | Beskrivning |
 --- | --- |

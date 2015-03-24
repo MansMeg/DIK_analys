@@ -45,8 +45,8 @@ calc_dik_stat <- function(AEA_data){
   # Ersättningstagare
   # Remove nonmembers of AEA
   dik_stat[["Ers_aktstod_anststod"]] <-
-    calc_ers_stat(AEA_data[AEA_data$alder < 65 & AEA_data$avisering %in% c("Direkt", "Förbund"), ])
-  AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$stat1 != "Studerande" & AEA_data$avisering %in% c("Direkt", "Förbund"), ]
+    calc_ers_stat(AEA_data[AEA_data$alder < 65 & AEA_data$avisering %in% c("Annat", "Direkt", "Förbund"), ])
+  AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$stat1 != "Studerande" & AEA_data$avisering %in% c("Annat", "Direkt", "Förbund"), ]
   dik_stat[["Ers_aktstod_anststod_ej_stud"]] <-
     calc_ers_stat(AEA_member_data)
 
@@ -127,8 +127,10 @@ calc_arbmarkn_stat <- function(AEA_data){
 calc_member_aea_stat <- function(AEA_data){
 
   av <- table(AEA_data$avisering)
+  if("Direkt" %in% names(av)) nam <- "Direkt" else nam <- "Annat"
+  
   res <- 
-    data.frame(direktaviserade = av["Direkt"], 
+    data.frame(direktaviserade = av[nam], 
                forbundsaviserade = av["Förbund"])
   res$tot_i_dik_och_aea <- res$direktaviserade + res$forbundsaviserade
   res$antal_medlemmar_dik <- nrow(AEA_data)

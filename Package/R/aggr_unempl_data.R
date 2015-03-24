@@ -30,7 +30,7 @@ aggr_unempl_data <- function(AEA_data){
   #dik_stat[["ers.csv"]] <-
   #  calc_ers_stat(AEA_data[AEA_data$alder < 65 & AEA_data$avisering %in% c("Direkt", "Förbund"), ])[c(2,4,8)]
   #names(dik_stat[["ers.csv"]]) <- c("ers_tagare","akt_stod","anst_m_stod")
-  AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$anst != "Studerande" & AEA_data$avisering %in% c("Direkt", "Förbund"), ]
+  AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$anst != "Studerande" & AEA_data$avisering %in% c("Annat", "Direkt", "Förbund"), ]
   dik_stat[["ers_ej_stud.csv"]] <-
     calc_ers_stat(AEA_member_data)[c(2,4,8)]
   names(dik_stat[["ers_ej_stud.csv"]]) <- c("ers_tagare","akt_stod","anst_m_stod")

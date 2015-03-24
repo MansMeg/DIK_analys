@@ -6,12 +6,18 @@ output: word_document
 ---
 
 ```{r, echo=FALSE}
+if(FALSE){
+  install.packages("ggplot2")
+  install.packages("lubridate")
+}
+
+
 # Parameters
 month <- "December"
 year <- "2014"
 comp_month <- month
 comp_year <- "2013"
-path <- "/Users/manma97/Dropbox/projekt/DIK_analys" # getwd()
+path <- "C:/Users/lisgem/Desktop/DIK_analys" #getwd()
 figures <- paste0("Unempl_plot")
 
 knitr::opts_chunk$set(echo=FALSE)
@@ -28,7 +34,7 @@ files <- dir(paste0(path, "/Data"))
 files <- files[stringr::str_detect(string = files,pattern =  ".csv")]
 for(file in files){
   assign(x=stringr::str_split(file, pattern = "\\.")[[1]][1], 
-         read.csv(paste0(path, "/Data/", file)))
+         read.csv(paste0(path, "/Data/", file),fileEncoding="UTF8"))
 }
 
 ## medlemmar_AEA_ej_stud
@@ -176,7 +182,6 @@ suppressWarnings(print(plt))
 
 # Save plot
 ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
-cat(paste0(figures,i, ".eps"))
 i <- i + 1
 ```
 
@@ -200,7 +205,6 @@ suppressWarnings(print(plt))
 
 # Save plot
 ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
-cat(paste0(figures,i, ".eps"))
 i <- i + 1
 
 ```
@@ -223,7 +227,6 @@ suppressWarnings(print(plt))
 
 # Save plot
 ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
-cat(paste0(figures,i, ".eps"))
 i <- i + 1
 ```
 
@@ -249,7 +252,6 @@ plt <-
 suppressWarnings(print(plt))
 # Save plot
 ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
-cat(paste0(figures,i, ".eps"))
 i <- i + 1
 ```
 
@@ -273,7 +275,6 @@ suppressWarnings(print(plt))
 
 # Save plot
 ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
-cat(paste0(figures,i, ".eps"))
 i <- i + 1
 ```
 
@@ -312,7 +313,6 @@ suppressWarnings(print(plt))
 
 # Save plot
 ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
-cat(paste0(figures,i, ".eps"))
 i <- i + 1
 ```
 
@@ -331,7 +331,6 @@ suppressWarnings(print(plt))
 
 # Save plot
 ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
-cat(paste0(figures,i, ".eps"))
 i <- i + 1
 ```
 
@@ -354,7 +353,6 @@ suppressWarnings(print(plt))
 
 # Save plot
 ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 6)
-cat(paste0(figures,i, ".eps"))
 i <- i + 1
 ```
 
@@ -375,7 +373,6 @@ suppressWarnings(print(plt))
 
 # Save plot
 ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
-cat(paste0(figures,i, ".eps"))
 i <- i + 1
 
 ```
@@ -397,7 +394,6 @@ suppressWarnings(print(plt))
 
 # Save plot
 ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
-cat(paste0(figures,i, ".eps"))
 i <- i + 1
 ```
 
@@ -419,7 +415,6 @@ suppressWarnings(print(plt))
 
 # Save plot
 ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 5)
-cat(paste0(figures,i, ".eps"))
 i <- i + 1
 ```
 
@@ -443,7 +438,6 @@ suppressWarnings(print(plt))
 
 # Save plot
 ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
-cat(paste0(figures,i, ".eps"))
 i <- i + 1
 ```
 
@@ -469,7 +463,6 @@ suppressWarnings(print(plt))
 
 # Save plot
 ggsave(plt, file=paste0(figures,i, ".eps"), width = 8, height = 4)
-cat(paste0(figures,i, ".eps"))
 i <- i + 1
 ```
 

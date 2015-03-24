@@ -1,3 +1,5 @@
+# Problem with windows
+# .libPaths(c("C://Users//lisgem//Rpackages//3.1", .libPaths()))
 
 # Install DIK package
 devtools::install_github(repo = "MansMeg/DIK_analys", subdir = "Package")

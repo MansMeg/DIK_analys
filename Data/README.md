@@ -113,14 +113,14 @@ Variabel | Beskrivning |
 ```anst_m_stod``` | Anställning med stöd |
 
 ## ers_AEA.csv
-Genomsnittlig ersättning och aktivitetsstöd i AEA. Hämtas från pdf.
+Genomsnittlig ersättning och aktivitetsstöd i AEA från samtliga medlemmar från samtliga förbund. Hämtas från AEA:s egen månadsstatstik. 
 
 Variabel | Beskrivning |
 --- | --- |
 ```year```  | |
 ```month```  | |
-```ers_tagare_p```  | Andel ersättningstagare AEA |
-```akt_stod_p```  | Andel i aktivitetsstöd (program hos Arbetsförmedlingen) AEA |
+```ers_tagare_p```  | Andel ersättningstagare AEA (i procent) |
+```akt_stod_p```  | Andel i aktivitetsstöd (program hos Arbetsförmedlingen) AEA  (i procent) |
 
 
 ## arb_prgm_b.csv

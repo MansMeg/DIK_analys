@@ -1,8 +1,8 @@
 Package: DIK
 Type: Package
 Title: DIK R package for statistical analysis.
-Version: 0.1
-Date: 2014-10-08
+Version: 0.1.1
+Date: 2015-03-24
 Author: Mans Magnusson
 Maintainer: Mans Magnusson <mons.magnusson@gmail.com>
 Description: R package for statistical analysis at DIK.
@@ -10,7 +10,9 @@ VignetteBuilder: knitr
 URL: https://github.com/MansMeg/DIK_analys
 BugReports: https://github.com/MansMeg/DIK_analys/issues
 License: AGPL-3
+Imports:
+    httr
 Suggests:
     testthat,
     ggplot2,
-    knitr
+    knitr,

@@ -55,13 +55,13 @@ read_AEA_file <- function(file_path, stat_var=NULL){
   if(!all(c("Studerande") %in% levels(AEAdf$anst))) warning("'Studerande' is missing in variable 'stat1'.", call. = FALSE)
   if(!any(stringr::str_detect(string = levels(AEAdf$utbniva), pattern = "Univ"))) warning("'Univ' is missing in variable 'stat2'.", call. = FALSE)
   if(!any(stringr::str_detect(string = levels(AEAdf$utbgrp), pattern = "Humaniora"))) warning("'Humaniora' is missing in variable 'utbgrp'.", call. = FALSE)
-  if(!all(c("Förbund") %in% levels(AEAdf$avisering))) warning("'Förbund' is missing in variable 'avisering'.", call. = FALSE)
+  if(!all(c("F\u00F6rbund") %in% levels(AEAdf$avisering))) warning("'F\u00F6rbund' is missing in variable 'avisering'.", call. = FALSE)
   if(!any(c("Direkt", "Annat") %in% levels(AEAdf$avisering))) warning("'Direkt' and 'Annat' is missing in variable 'avisering'.", call. = FALSE)
   if(!all(c("X") %in% levels(AEAdf$ers))) warning("'X' is missing in variable 'ers'.", call. = FALSE)
   if(!all(c("X") %in% levels(AEAdf$infopost))) warning("'X' is missing in variable 'infopost'.", call. = FALSE)
   
   # Corrections
-  levels(AEAdf$lan)[levels(AEAdf$lan) == ""] <- "Okänd"
+  levels(AEAdf$lan)[levels(AEAdf$lan) == ""] <- "Ok\u00E4nd"
   
   # Setting addition class
   class(AEAdf) <- c("AEA_data", "data.frame")

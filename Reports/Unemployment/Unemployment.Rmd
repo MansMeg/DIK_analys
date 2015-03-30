@@ -17,7 +17,7 @@ month <- "December"
 year <- "2014"
 comp_month <- month
 comp_year <- "2013"
-path <- "C:/Users/lisgem/Desktop/DIK_analys" #getwd()
+path <- "H:/DIK_analys" #getwd()
 figures <- paste0("Unempl_plot")
 
 knitr::opts_chunk$set(echo=FALSE)
@@ -197,7 +197,7 @@ Andelen arbetssökande ligger i det närmaste oförändrat i under årets tre f�
 plt <-
   ggplot(data=unempl_data, aes(x=date, y=unemp_tot)) + 
     geom_line(color="red") +
-    ylim(c(0,5)) + 
+    ylim(c(0,6)) + 
     xlab("") + ylab("Procent (%)") + 
     ggtitle(expression(atop("Arbetslöshetens utveckling", atop("Ersättningstagare och aktivitetsersättning"), "")))
 

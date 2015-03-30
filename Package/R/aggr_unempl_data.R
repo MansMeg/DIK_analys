@@ -3,12 +3,14 @@
 #' 
 #' @param AEA_data
 #' Data set from AEA read into R.
+#' @param classification_source_folder
+#' Folder where the classification files is located
 #' 
 #' @description
 #' Calculates all statistics of interest and store it as list ready to append to data files.
 #' 
 #' @export
-aggr_unempl_data <- function(AEA_data){
+aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
   check_class(AEA_data, "AEA_data")
 
   dik_stat <- list()  
@@ -76,7 +78,7 @@ aggr_unempl_data <- function(AEA_data){
 
   # Intrest group
   intr_group <-
-    do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(x = AEA_member_data$intrgrp, type = "intressegrupp")), calc_ers_stat))
+    do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(x = AEA_member_data$intrgrp, type = "intressegrupp",source_folder = classification_source_folder)), calc_ers_stat))
   intr_group <- cbind(rownames(intr_group), intr_group[,c(1,2,4,8)])
   colnames(intr_group) <- c("intressegrupp","antal","ers_tagare","akt_stod","anst_m_stod")
   rownames(intr_group) <- NULL
@@ -84,7 +86,7 @@ aggr_unempl_data <- function(AEA_data){
   
   # Utb.inriktning 
   utb_group <-
-    do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(AEA_member_data$utbgrp, "utbildningsgrupp")), calc_ers_stat))  
+    do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(AEA_member_data$utbgrp, "utbildningsgrupp", source_folder = classification_source_folder)), calc_ers_stat))  
   utb_group <- cbind(rownames(utb_group), utb_group[,c(1,2,4,8)])
   colnames(utb_group) <- c("utb_grupp","antal","ers_tagare","akt_stod","anst_m_stod")
   rownames(utb_group) <- NULL

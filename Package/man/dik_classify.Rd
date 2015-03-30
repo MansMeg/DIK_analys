@@ -3,12 +3,15 @@
 \alias{dik_classify}
 \title{Classifies based on DIK interest groups}
 \usage{
-dik_classify(x, type = c("utbildningsgrupp", "intressegrupp"))
+dik_classify(x, type = c("utbildningsgrupp", "intressegrupp"),
+  source_folder = NULL)
 }
 \arguments{
 \item{x}{variable to classify}
 
 \item{type}{which classification to use ("utbildningsgrupp" or "intressegrupp")}
+
+\item{source_folder}{Folder that contain Utbildningsgrupper.csv and Intressegrupper.csv}
 }
 \description{
 Classifies based on DIK interest groups

@@ -45,8 +45,8 @@ calc_dik_stat <- function(AEA_data){
   # Ersättningstagare
   # Remove nonmembers of AEA
   dik_stat[["Ers_aktstod_anststod"]] <-
-    calc_ers_stat(AEA_data[AEA_data$alder < 65 & AEA_data$avisering %in% c("Direkt", "Förbund"), ])
-  AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$stat1 != "Studerande" & AEA_data$avisering %in% c("Direkt", "Förbund"), ]
+    calc_ers_stat(AEA_data[AEA_data$alder < 65 & AEA_data$avisering %in% c("Annat", "Direkt", "Förbund"), ])
+  AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$stat1 != "Studerande" & AEA_data$avisering %in% c("Annat", "Direkt", "Förbund"), ]
   dik_stat[["Ers_aktstod_anststod_ej_stud"]] <-
     calc_ers_stat(AEA_member_data)
 
@@ -127,8 +127,10 @@ calc_arbmarkn_stat <- function(AEA_data){
 calc_member_aea_stat <- function(AEA_data){
 
   av <- table(AEA_data$avisering)
+  if("Direkt" %in% names(av)) nam <- "Direkt" else nam <- "Annat"
+  
   res <- 
-    data.frame(direktaviserade = av["Direkt"], 
+    data.frame(direktaviserade = av[nam], 
                forbundsaviserade = av["Förbund"])
   res$tot_i_dik_och_aea <- res$direktaviserade + res$forbundsaviserade
   res$antal_medlemmar_dik <- nrow(AEA_data)
@@ -163,41 +165,5 @@ calc_ers_stat <- function(AEA_data){
   
   rownames(res) <- NULL
   return(res)  
-}
-
-
-#' @title
-#' Classifies based on DIK interest groups
-#' 
-#' @param x variable to classify
-#' @param type which classification to use ("utbildningsgrupp" or "intressegrupp")
-#' 
-#' @details
-#' The functions classifies using the classifiers found here:
-#' \url{https://github.com/MansMeg/DIK_analys/tree/master/Classification}
-#' 
-#' @export
-dik_classify <- function(x, type = c("utbildningsgrupp", "intressegrupp")){
-  x <- as.factor(x)
-  if(substr(type[1], 1, 3) == "utb"){
-    class_url <- "https://raw.githubusercontent.com/MansMeg/DIK_analys/master/Classification/Utbildningsgrupper.csv"
-  } else if (substr(type[1], 1, 3) == "int"){
-    class_url <- "https://raw.githubusercontent.com/MansMeg/DIK_analys/master/Classification/Intressegrupper.csv"
-  }
-  class_table <- suppressMessages(repmis::source_data(url = class_url, stringsAsFactors = FALSE))
-  class_table[,2] <- tolower(class_table[,2])
-  names(class_table)[2] <- "label"
-  
-  add_label_df <- data.frame(rowno=1:length(levels(x)), Label = stringr::str_trim(levels(x)), label = tolower(stringr::str_trim(levels(x))), stringsAsFactors = FALSE)
-  add_label_df <- merge(add_label_df, class_table, all.x = TRUE)
-  not_in_class <- is.na(add_label_df[,4])
-  
-  if(any(not_in_class)) {
-    warning("The following classes has not been classified:\n'",
-            paste(add_label_df$Label[not_in_class], collapse="'\n'"), "'")
-    add_label_df[not_in_class, 4] <- "NOT CLASSIFIED"
-  }
-  levels(x) <- add_label_df[order(add_label_df$rowno), 4]
-  factor(as.character(x))
 }
 

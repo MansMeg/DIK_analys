@@ -3,10 +3,12 @@
 \alias{aggr_unempl_data}
 \title{Calculate all statistics}
 \usage{
-aggr_unempl_data(AEA_data)
+aggr_unempl_data(AEA_data, classification_source_folder = NULL)
 }
 \arguments{
 \item{AEA_data}{Data set from AEA read into R.}
+
+\item{classification_source_folder}{Folder where the classification files is located}
 }
 \description{
 Calculates all statistics of interest and store it as list ready to append to data files.

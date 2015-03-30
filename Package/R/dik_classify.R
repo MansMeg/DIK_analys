@@ -27,16 +27,16 @@ dik_classify <- function(x, type = c("utbildningsgrupp", "intressegrupp"), sourc
     request <- httr::GET(class_url)
     httr::stop_for_status(request)
     writeBin(httr::content(request, type = "raw"), temp_file)
-    class_table <- read.csv(temp_file)
+    class_table <- read.csv(temp_file, fileEncoding = "utf8")
     
   } else {
     # Check source folder
     if(substr(type[1], 1, 3) == "utb"){
       if(!"Utbildningsgrupper.csv"%in%dir(source_folder)) stop("Utbildningsgrupper.csv is missing in source folder.")
-      class_table <- read.csv(paste0(source_folder, "/Utbildningsgrupper.csv"))
+      class_table <- read.csv(paste0(source_folder, "/Utbildningsgrupper.csv"), fileEncoding = "utf8")
     } else if (substr(type[1], 1, 3) == "int"){
       if(!"Intressegrupper.csv"%in%dir(source_folder)) stop("Utbildningsgrupper.csv is missing in source folder.")
-      class_table <- read.csv(paste0(source_folder, "/Intressegrupper.csv"))
+      class_table <- read.csv(paste0(source_folder, "/Intressegrupper.csv"), fileEncoding = "utf8")
     }
   }
   

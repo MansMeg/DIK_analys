@@ -20,7 +20,7 @@ write_dik_stat_csv <- function(dik_stat, db_path){
     temp_df <- rbind(temp_df, cbind(yearmonth[rep(1,nrow(dik_stat[[i]])),], dik_stat[[i]]))
     temp_df <- temp_df[order(temp_df$year, dik_month_strings_to_factor(x = temp_df$month)),]    
     rownames(temp_df) <- NULL
-    write.csv(temp_df, paste0(db_path, names(dik_stat)[i]), row.names=FALSE)
+    write.csv(temp_df, paste0(db_path, names(dik_stat)[i]), row.names=FALSE, fileEncoding="utf8")
   }  
 }
 

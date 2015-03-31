@@ -26,13 +26,10 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
   names(dik_stat[["medlemmar_AEA_ej_stud.csv"]]) <- c("Direktaviserade_AEA","Forbundsaviserade_AEA","Medlemmar_DIK_upp_till_65")
 
   
-  # Ersättningstagare
+  # Ersattningstagare
   
   # Remove nonmembers of AEA
-  #dik_stat[["ers.csv"]] <-
-  #  calc_ers_stat(AEA_data[AEA_data$alder < 65 & AEA_data$avisering %in% c("Direkt", "Förbund"), ])[c(2,4,8)]
-  #names(dik_stat[["ers.csv"]]) <- c("ers_tagare","akt_stod","anst_m_stod")
-  AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$anst != "Studerande" & AEA_data$avisering %in% c("Annat", "Direkt", "Förbund"), ]
+  AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$anst != "Studerande" & AEA_data$avisering %in% c("Annat", "Direkt", "F\u00F6rbund"), ]
   dik_stat[["ers_ej_stud.csv"]] <-
     calc_ers_stat(AEA_member_data)[c(2,4,8)]
   names(dik_stat[["ers_ej_stud.csv"]]) <- c("ers_tagare","akt_stod","anst_m_stod")

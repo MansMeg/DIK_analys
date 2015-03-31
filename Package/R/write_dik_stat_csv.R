@@ -14,7 +14,7 @@ write_dik_stat_csv <- function(dik_stat, db_path){
               "september", "oktober", "november", "december")
   
   for(i in seq_along(dik_stat)[-1]){ 
-    temp_df <- read.csv(paste0(db_path,names(dik_stat)[i]))
+    temp_df <- read.csv(paste0(db_path,names(dik_stat)[i]), fileEncoding="utf8")
     to_keep <- !(temp_df$year %in% yearmonth$year & temp_df$month %in% yearmonth$month)
     temp_df <- temp_df[to_keep,]
     temp_df <- rbind(temp_df, cbind(yearmonth[rep(1,nrow(dik_stat[[i]])),], dik_stat[[i]]))

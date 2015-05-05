@@ -66,6 +66,9 @@ read_AEA_file <- function(file_path, stat_var=NULL){
   # Setting addition class
   class(AEAdf) <- c("AEA_data", "data.frame")
   
+  # Do makro checks of data
+  if(table(AEAdf$avisering)["F\u00F6rbund"] < 1000) warning("F\u00F6rbundsaviseringar < 1000")
+  
   return(AEAdf)
 }
 

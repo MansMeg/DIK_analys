@@ -2,15 +2,15 @@
 .libPaths(c("C:/Users/stiham/Rpackages/3.1", .libPaths()))
 
 # Install DIK package
-# devtools::install_github(repo = "MansMeg/DIK_analys", subdir = "Package")
+ devtools::install_github(repo = "MansMeg/DIK_analys", subdir = "Package")
 
 # Load DIK package
 library(DIK)
 
 
 # Ange sökväg till AEA-filen
-# file.choose()
-file_path <- "G:\\DIK\\DIK2015\\PM\\Stina 2015\\Arbetslöshetsstatistik\\FIler från AEA\\arbetsloshetsstatistik_36_20150317.csv"
+ file.choose()
+file_path <- "G:\\DIK\\DIK2015\\PM\\Stina 2015\\Arbetslöshetsstatistik\\FIler från AEA\\arbetsloshetsstatistik_36_20150505.csv"
 
 # Läs in datan i R
 AEA_data <- DIK::read_AEA_file(file_path)

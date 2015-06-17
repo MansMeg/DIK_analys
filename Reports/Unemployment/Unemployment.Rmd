@@ -416,10 +416,10 @@ Högst andel arbetssökande har gruppen utbildade inom arkeologi och gruppen dä
 plt <- 
   ggplot(data=utb_bar_plot1, aes(x=utb_grupp, y=value, fill=type)) + 
     geom_bar(stat="identity", position=position_dodge()) +
-    scale_fill_manual(values=c("black", "darkgray", "red"), name="") +
+    scale_fill_manual(values=c("black", "darkgray", "red"), name="", guide = guide_legend(direction = "vertical")) +
     xlab("") + ylab("Procent (%)") + coord_flip() +
     ggtitle("A-kassa och aktivitetsstöd") +
-    theme(legend.position="top")
+    theme(legend.position="bottom") 
 
 suppressWarnings(print(plt))
 

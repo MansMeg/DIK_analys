@@ -1,6 +1,6 @@
 ---
 title: "Arbetslöshet"
-author: "Lisa Gemmel"
+author: "Stina Hamberg"
 date: "28 februari 2015"
 output: word_document
 ---
@@ -13,11 +13,11 @@ if(FALSE){
 
 
 # Parameters
-month <- "December"
-year <- "2014"
+month <- "April"
+year <- "2015"
 comp_month <- month
-comp_year <- "2013"
-path <- "H:/DIK_analys" #getwd()
+comp_year <- "2014"
+path <- "G:/DIK/DIK2015/PM/Stina 2015/DIK_analys" #getwd()
 figures <- paste0("Unempl_plot")
 
 knitr::opts_chunk$set(echo=FALSE)
@@ -129,6 +129,8 @@ age_bar_plot2 <- ers_by_age[(ers_by_age$month == tolower(month) & ers_by_age$yea
 
 ### utb_bar_plots
 utb_bar_plot0 <- utb_bar_plot1 <- ers_by_education[ers_by_education$month == tolower(month) & ers_by_education$year == as.numeric(year),]
+utb_bar_plot0 <- utb_bar_plot0[utb_bar_plot0$antal>499, ]
+
 utb_bar_plot_tmp1 <- utb_bar_plot1[,c("utb_grupp", "unemp_akt")]
 utb_bar_plot_tmp1$type <- "Aktivitetsersättning"
 colnames(utb_bar_plot_tmp1)[2] <- "value"
@@ -139,9 +141,12 @@ utb_bar_plot_tmp3 <- utb_bar_plot1[,c("utb_grupp", "unemp_anst")]
 utb_bar_plot_tmp3$type <- "Anställning m. stöd"
 colnames(utb_bar_plot_tmp3)[2] <- "value"
 utb_bar_plot1 <- rbind(utb_bar_plot_tmp1,utb_bar_plot_tmp2,utb_bar_plot_tmp3)
+utb_bar_plot1 <- utb_bar_plot1[utb_bar_plot1$utb_grupp!="Logopedutbildning",] # Remove logopedutbildning
+
 
 utb_bar_plot2 <- ers_by_education[(ers_by_education$month == tolower(month) & ers_by_education$year == as.numeric(year)) |
                             (ers_by_education$month == tolower(comp_month) & ers_by_education$year == as.numeric(comp_year)),]
+utb_bar_plot2 <- utb_bar_plot2[utb_bar_plot2$utb_grupp!="Logopedutbildning",] # Remove logopedutbildning
 
 # Plot number
 i <- 1
@@ -362,10 +367,15 @@ Den lägsta andelen arbetssökande under `r tolower(month)` månad hittas i grup
 Siffrorna för gruppen under 25 år ska tolkas med försiktighet. Hela gruppen bestod i `r tolower(month)` `r year` enbart av 107 individer vilket gör att en individ som går till eller ifrån arbete får stort utslag på andelstalen.  
 
 ```{r}
+# Reorder color and type
+order_idx <- c(3,1,2)
+age_bar_plot1$type <- factor(age_bar_plot1$type,levels(age_bar_plot1$type)[order_idx])
+age_bar_plot1 <- age_bar_plot1[order(as.numeric(age_bar_plot1$type)),]
+
 plt <- 
   ggplot(data=age_bar_plot1, aes(x=age_group, y=value, fill=type)) + 
-    geom_bar(stat="identity", position=position_dodge()) +
-    scale_fill_manual(values=c("black", "darkgray", "red"), name="") +
+    geom_bar(stat="identity") +
+    scale_fill_manual(values=c("black", "darkgray", "red")[order_idx], name="") +
     xlab("") + ylab("Procent (%)") + coord_flip() +
     ggtitle(expression(atop("A-kassa och aktivitetsstöd", atop("efter åldersgrupp och ersättningstyp"), "")))
 
@@ -457,7 +467,7 @@ plt <-
   ggplot(data=utb_bar_plot0, aes(x=utb_grupp, y=antal)) + 
     geom_bar(stat="identity", position=position_dodge(), fill="red") +
     xlab("") + ylab("Antal medlemmar") + coord_flip() +
-    ggtitle(expression(atop("A-kassa och aktivitetsstöd", atop("efter utbildningsgrupp"), "")))
+    ggtitle(expression(atop("Antal medlemmar", atop("efter utbildningsgrupp"), "")))
 
 suppressWarnings(print(plt))
 

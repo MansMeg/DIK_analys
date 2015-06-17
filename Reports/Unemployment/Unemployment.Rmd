@@ -369,7 +369,7 @@ Siffrorna för gruppen under 25 år ska tolkas med försiktighet. Hela gruppen b
 ```{r}
 # Reorder color and type
 order_idx <- c(3,1,2)
-age_bar_plot1$type <- factor(age_bar_plot1$type,levels(age_bar_plot1$type)[order_idx])
+age_bar_plot1$type <- factor(age_bar_plot1$type, levels(as.factor(age_bar_plot1$type))[order_idx])
 age_bar_plot1 <- age_bar_plot1[order(as.numeric(age_bar_plot1$type)),]
 
 plt <- 

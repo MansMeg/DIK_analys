@@ -30,7 +30,7 @@
 #' 
 read_AEA_file <- function(file_path, stat_var=NULL){
   if(!file.exists(file_path)) stop("File does not exist.")
-  if(!is.null(stat_var) | !all(stat_var %in% c("anst", "utbniva", "utbgrp", "intrgrp", "sektor"))) stop("stat_var do not contain the correct names.")
+  if(!is.null(stat_var) & !all(c("anst", "utbniva", "utbgrp", "intrgrp") %in% stat_var)) stop("stat_var do not contain the correct names.")
 
   AEAdf <- read.csv(file = file_path, fileEncoding="cp1252", stringsAsFactors=TRUE)
   

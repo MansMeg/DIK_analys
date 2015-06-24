@@ -10,7 +10,7 @@ library(DIK)
 
 # Ange sökväg till AEA-filen
  file.choose()
-file_path <- "G:\\DIK\\DIK2015\\PM\\Stina 2015\\Arbetslöshetsstatistik\\FIler från AEA\\arbetsloshetsstatistik_36_20150505.csv"
+file_path <- "G:\\DIK\\DIK2015\\PM\\Stina 2015\\Arbetslöshetsstatistik\\FIler från AEA\\arbetsloshetsstatistik_36_dec.csv"
 
 # Läs in datan i R
 AEA_data <- DIK::read_AEA_file(file_path)

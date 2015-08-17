@@ -1,7 +1,7 @@
 ---
 title: "Arbetslöshet"
 author: "Stina Hamberg"
-date: "28 februari 2015"
+date: "24 juni 2015"
 output: word_document
 ---
 
@@ -13,7 +13,7 @@ if(FALSE){
 
 
 # Parameters
-month <- "April"
+month <- "Maj"
 year <- "2015"
 comp_month <- month
 comp_year <- "2014"

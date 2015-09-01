@@ -10,8 +10,7 @@
 write_dik_stat_csv <- function(dik_stat, db_path){
   check_class(dik_stat, "dik_stat")
   yearmonth <- dik_month_to_strings(dik_stat$Month)
-  months <- c("januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", 
-              "september", "oktober", "november", "december")
+  months <- months_constant()
   
   for(i in seq_along(dik_stat)[-1]){ 
     temp_df <- read.csv(paste0(db_path,names(dik_stat)[i]), fileEncoding="utf8")
@@ -26,8 +25,7 @@ write_dik_stat_csv <- function(dik_stat, db_path){
 
 
 dik_month_to_strings <- function(x){
-  months <- c("januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", 
-              "september", "oktober", "november", "december")
+  months <- months_constant()
   output <-   
     data.frame(year = as.numeric(substr(dik_stat$Month,1,4)),
                month = months[as.numeric(substr(dik_stat$Month,5,6))])
@@ -37,8 +35,8 @@ dik_month_to_strings <- function(x){
 dik_month_strings_to_factor <- function(x){
   x <- as.character(x)
   res <- integer(length(x))
-  months <- c("januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", 
-              "september", "oktober", "november", "december")
+  months <- months_constant()
+  
   for(i in seq_along(x)){
     res[i] <- which(months %in% tolower(x[i]))
   }

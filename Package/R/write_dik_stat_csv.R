@@ -10,6 +10,7 @@
 write_dik_stat_csv <- function(dik_stat, db_path){
   check_class(dik_stat, "dik_stat")
   yearmonth <- dik_month_to_strings(dik_stat$Month)
+  check_dik_data(db_path)
   months <- months_constant()
   
   for(i in seq_along(dik_stat)[-1]){ 

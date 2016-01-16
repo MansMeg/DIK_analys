@@ -1,8 +1,9 @@
 # Problem with windows
-.libPaths(c("C:/Users/stiham/Rpackages/3.1", .libPaths()))
+# .libPaths(c("C:/Users/stiham/Rpackages/3.1", .libPaths()))
+lib_path <- "C:/Users/stiham/Rpackages/3.1"
 
 # Install DIK package
- devtools::install_github(repo = "MansMeg/DIK_analys", subdir = "Package")
+ devtools::install_github(repo = "MansMeg/DIK_analys", subdir = "Package", lib=lib_path)
 
 # Load DIK package
 library(DIK)

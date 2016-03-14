@@ -1,3 +1,4 @@
+library(httr)
 
 # Läs in funktioner från "Package/R/" 
 file_paths <- list.files("Package/R/", full.names = TRUE)

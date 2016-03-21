@@ -1,5 +1,5 @@
 # Problem with windows
-lib_path <- "C:/Users/stiham/Rpackages/3.1"
+lib_path <- "C:/Users/stiham/Rpackages/3.2"
 .libPaths(c(lib_path, .libPaths()))
 
 # Install DIK package

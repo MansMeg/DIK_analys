@@ -17,12 +17,9 @@ for(file_path in file_paths){
 }
 
 # Ange sökväg till AEA-filen
-<<<<<<< HEAD
-file_path <- "G:\\DIK\\DIK2016\\PM\\Stina 2016\\Arbetslöshetsstatistik\\Från AEA\\arbetsloshetsstatistik_36_jan.csv"
-=======
-file_path <- "G:\\DIK\\DIK2015\\PM\\Stina 2015\\Arbetslöshetsstatistik\\FIler från AEA\\arbetsloshetsstatistik_36_juni.csv"
->>>>>>> a43a68053f991f3977b8db3d87d5dd5ae348f07e
 file.choose()
+file_path <- "G:\\DIK\\DIK2016\\PM\\Stina 2016\\Arbetslöshetsstatistik\\Från AEA\\arbetsloshetsstatistik_36_jan.csv"
+
 
 # Läs in datan i R
 AEA_data <- read_AEA_file(file_path)

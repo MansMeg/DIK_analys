@@ -12,13 +12,18 @@ for( pkg in needed_packages){
 
 # Läs in funktioner från "Package/R/" 
 file_paths <- list.files("Package/R/", full.names = TRUE)
+
+
+
 for(file_path in file_paths){
   source(file = file_path)
 }
 
+
+
 # Ange sökväg till AEA-filen
 file.choose()
-file_path <- "G:\\DIK\\DIK2016\\PM\\Stina 2016\\Arbetslöshetsstatistik\\Från AEA\\arbetsloshetsstatistik_36_jan.csv"
+file_path <- "G:\\DIK\\DIK2016\\PM\\Stina 2016\\Arbetslöshetsstatistik\\Från AEA\\arbetsloshetsstatistik_36_20170118_dec.csv"
 
 
 # Läs in datan i R

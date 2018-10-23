@@ -46,7 +46,7 @@ read_AEA_file <- function(file_path, stat_var=NULL){
   if(is.null(stat_var)){
     for (st in paste0("stat", 1:5)){
       colname_index <- which(colnames(AEAdf) == st) 
-      colnames(AEAdf)[colname_index] <- find_stat_var_name(x = AEAdf[,st])
+      colnames(AEAdf)[colname_index] <- DIK:::find_stat_var_name(x = AEAdf[,st])
     }    
   } else {
     names(AEAdf)[names(AEAdf) %in% paste0("stat", 1:5)] <- stat_var
@@ -57,7 +57,7 @@ read_AEA_file <- function(file_path, stat_var=NULL){
   
   # Check that classes exist that is needed
   if(!all(c("Studerande") %in% levels(AEAdf$anst))) warning("'Studerande' is missing in variable 'stat1'.", call. = FALSE)
-  if(!any(stringr::str_detect(string = levels(AEAdf$utbniva), pattern = "Univ"))) warning("'Univ' is missing in variable 'stat2'.", call. = FALSE)
+  if(!any(stringr::str_detect(string = levels(AEAdf$utbniva), pattern = " univ"))) warning("'universitet' is missing in variable 'stat2'.", call. = FALSE)
   if(!any(stringr::str_detect(string = levels(AEAdf$utbgrp), pattern = "Humaniora"))) warning("'Humaniora' is missing in variable 'utbgrp'.", call. = FALSE)
   if(!all(c("F\u00F6rbund") %in% levels(AEAdf$avisering))) warning("'F\u00F6rbund' is missing in variable 'avisering'.", call. = FALSE)
   if(!any(c("Direkt", "Annat") %in% levels(AEAdf$avisering))) warning("'Direkt' and 'Annat' is missing in variable 'avisering'.", call. = FALSE)
@@ -104,9 +104,9 @@ check_class <- function(x, class_name){
 #' 
 find_stat_var_name<- function(x){
   res <- "ERROR"
-  if(all(c("Kommunal", "Statlig", "Privat") %in% levels(x))) res <- "sektor"
+  if(all(c("Kommunal", "Statlig", "Privat") %in% levels(x)) | all(c("Kommun", "Stat", "Privat") %in% levels(x))) res <- "sektor"
   if(all(c("Sjukskriven", "Studerande", "Pensionerad") %in% levels(x))) res <- "anst"
-  if(any(stringr::str_detect(string = levels(x), pattern = "Univ"))) res <- "utbniva"
+  if(any(stringr::str_detect(string = tolower(levels(x)), pattern = " universitet"))) res <- "utbniva"
   if(all(c("Bibliotekarieutbildning", "Arkeologi") %in% levels(x))) res <- "utbgrp"
   if(all(c("Bibliotek", "Museum", "Kommunikation") %in% levels(x))) res <- "intrgrp"
   if(res == "ERROR") warning("Could not identify 'stat' variable automatically.", call. = FALSE)

@@ -18,9 +18,10 @@ Om PDF:er ska kunna produceras direkt behöver också [MikTeX](http://git-scm.co
 I paketet `DIK` finns en hel del funktionalitet för att hantera AEA-filer och smmanställa dessa. Använd `devtools` (kan behöva installeras med `install.package()`) för att installera paketet:
 
 ```r
-devtools::install_github(repo = "DIK_analys", username = "MansMeg")
+devtools::install_github(repo = "DIK_analys", username = "MansMeg", subdir = "Package")
 library(DIK)
 ```
+
 
 # Att hantera DIK:s arbetslöshetsstatistik
 

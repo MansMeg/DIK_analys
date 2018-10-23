@@ -14,8 +14,9 @@ check_dik_data <-function(db_path){
   # To check in all files
   for(i in seq_along(csv_files)){ 
     temp_df <- read.csv(paste0(db_path,csv_files[i]), fileEncoding="utf8")
-    if(!all(tolower(temp_df$month) %in% months_constant())){
-      stop(paste0("Error in month names in ", csv_files[i]))
+    correct_months <- tolower(temp_df$month) %in% months_constant()
+    if(!all(correct_months)){
+      stop(paste0("Error in month names in '", csv_files[i], "' at row ", paste(which(!correct_months), collapse = ", "), "."))
     }
   }
 }

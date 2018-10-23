@@ -104,8 +104,15 @@ calc_arbmarkn_stat <- function(AEA_data){
   arb_program2$arb_m_stod <- sum(AEA_data$utbprogram != "" & AEA_data$ers != "X" & AEA_data$infopost != "X")
   arb_program2$i_prg_utan_ers <- arb_program2$totalt - arb_program2$ers_tagare
   arb_program2$aktivitetsers <- arb_program2$totalt - arb_program2$ers_tagare - arb_program2$arb_m_stod
-  arb_program2$jug <- arb_program1[arb_program1$program == "Jobb och utvecklingsgaranti", "antal"]
-  arb_program2$fas3 <- arb_program1[arb_program1$program == "Jobb o utvecklingsgaranti fas 3", "antal"]
+  
+  jug <- arb_program1[arb_program1$program == "Jobb och utvecklingsgaranti", "antal"]
+  if(length(jug) == 0) jug <- 0
+  arb_program2$jug <- jug
+  
+  fas3 <- arb_program1[arb_program1$program == "Jobb o utvecklingsgaranti fas 3", "antal"]
+  if(length(fas3) == 0) fas3 <- 0
+  arb_program2$fas3 <- fas3
+  
   arb_program2$ovriga <- arb_program2$totalt - arb_program2$arb_m_stod - arb_program2$jug - arb_program2$fas3
   arb_program2 <- arb_program2[, c(1, 4, 5, 2, 3, 6, 7, 8)]
 

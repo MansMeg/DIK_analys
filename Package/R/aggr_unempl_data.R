@@ -83,7 +83,7 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
   dik_stat[["ers_by_interest_group.csv"]] <- intr_group
   
   # Utb.inriktning 
-  AEA_member_data$utbgrp_class <- dik_classify(AEA_member_data$utbgrp, "utbildningsgrupp", source_folder = classification_source_folder)
+  AEA_member_data$utbgrp_class <- dik_classify(x = AEA_member_data$utbgrp, type = "utbildningsgrupp", source_folder = classification_source_folder)
   utb_group <-
     do.call(rbind, lapply(split(x = AEA_member_data, AEA_member_data$utbgrp_class), calc_ers_stat))  
   utb_group <- cbind(rownames(utb_group), utb_group[,c(1,2,4,8)])

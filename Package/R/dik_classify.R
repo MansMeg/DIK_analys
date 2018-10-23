@@ -12,8 +12,10 @@
 #' @export
 dik_classify <- function(x, type = c("utbildningsgrupp", "intressegrupp"), source_folder = NULL){
   nas <- is.na(x)
-  if(any(nas)) warning(paste0(sum(nas), " missing values in '", type, "' set to 'Uppgift saknas'.") , call. = FALSE)
-  x[is.na(x)] <- "Uppgift saknas"
+  if(any(nas)) {
+    warning(paste0(sum(nas), " missing values in '", type, "' set to 'Uppgift saknas'.") , call. = FALSE)
+    x[nas] <- "Uppgift saknas"
+  }
   x <- as.factor(x)
   
   class_files <- c("Intressegrupper.csv", "Utbildningsgrupper.csv")

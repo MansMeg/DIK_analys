@@ -42,15 +42,19 @@ read_AEA_file <- function(file_path, stat_var=NULL){
   if(!all(var_exist)) warning(paste0("The following variables is missing: \n'", 
                                      paste(var_names[!var_exist], collapse = "', '"), "'"), call. = FALSE)
   # Change names
+  origin_name <- names(AEAdf)
   if(is.null(stat_var)){
     for (st in paste0("stat", 1:5)){
       colname_index <- which(colnames(AEAdf) == st) 
-      colnames(AEAdf)[colname_index] <- find_stat_var_name(AEAdf[,st])
+      colnames(AEAdf)[colname_index] <- find_stat_var_name(x = AEAdf[,st])
     }    
   } else {
     names(AEAdf)[names(AEAdf) %in% paste0("stat", 1:5)] <- stat_var
   }
-
+  error_column <- which(names(AEAdf) == "ERROR")
+  if(length(error_column) > 0) warning("The following variables cannot be identified: " , paste(origin_name[error_column], collapse = ", "))
+  names(AEAdf)[error_column] <- origin_name[error_column]
+  
   # Check that classes exist that is needed
   if(!all(c("Studerande") %in% levels(AEAdf$anst))) warning("'Studerande' is missing in variable 'stat1'.", call. = FALSE)
   if(!any(stringr::str_detect(string = levels(AEAdf$utbniva), pattern = "Univ"))) warning("'Univ' is missing in variable 'stat2'.", call. = FALSE)
@@ -105,6 +109,6 @@ find_stat_var_name<- function(x){
   if(any(stringr::str_detect(string = levels(x), pattern = "Univ"))) res <- "utbniva"
   if(all(c("Bibliotekarieutbildning", "Arkeologi") %in% levels(x))) res <- "utbgrp"
   if(all(c("Bibliotek", "Museum", "Kommunikation") %in% levels(x))) res <- "intrgrp"
-  if(res == "ERROR") warning("Could not find variable automatically.")
+  if(res == "ERROR") warning("Could not identify 'stat' variable automatically.", call. = FALSE)
   res
 }

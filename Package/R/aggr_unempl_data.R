@@ -74,16 +74,18 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
   dik_stat[["ers_by_age.csv"]] <- ages
 
   # Intrest group
+  AEA_member_data$intrgrp_class <- dik_classify(x = AEA_member_data$intrgrp, type = "intressegrupp", source_folder = classification_source_folder)
   intr_group <-
-    do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(x = AEA_member_data$intrgrp, type = "intressegrupp",source_folder = classification_source_folder)), calc_ers_stat))
+    do.call(rbind, lapply(split(x = AEA_member_data, AEA_member_data$intrgrp_class), calc_ers_stat))
   intr_group <- cbind(rownames(intr_group), intr_group[,c(1,2,4,8)])
   colnames(intr_group) <- c("intressegrupp","antal","ers_tagare","akt_stod","anst_m_stod")
   rownames(intr_group) <- NULL
   dik_stat[["ers_by_interest_group.csv"]] <- intr_group
   
   # Utb.inriktning 
+  AEA_member_data$utbgrp_class <- dik_classify(AEA_member_data$utbgrp, "utbildningsgrupp", source_folder = classification_source_folder)
   utb_group <-
-    do.call(rbind, lapply(split(x = AEA_member_data, dik_classify(AEA_member_data$utbgrp, "utbildningsgrupp", source_folder = classification_source_folder)), calc_ers_stat))  
+    do.call(rbind, lapply(split(x = AEA_member_data, AEA_member_data$utbgrp_class), calc_ers_stat))  
   utb_group <- cbind(rownames(utb_group), utb_group[,c(1,2,4,8)])
   colnames(utb_group) <- c("utb_grupp","antal","ers_tagare","akt_stod","anst_m_stod")
   rownames(utb_group) <- NULL

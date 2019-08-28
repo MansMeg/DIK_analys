@@ -16,7 +16,7 @@ file_path <- file.choose()
 # Läs in datan i R
 # AEA_data <- read_AEA_file(file_path, stat_var = c("stat1"="intrgrp", "stat2"="sektor", "stat3"="anst", "stat4" = "utbniva", "stat5" = "utbgrp"))
 AEA_data <- read_AEA_file(file_path)
-
+# Can warn for missing values.
 
 # Gör beräkningar/producera statistik
 dik_stat <- aggr_unempl_data(AEA_data = AEA_data)

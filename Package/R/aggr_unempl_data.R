@@ -36,7 +36,7 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
     AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$anst != "Studerande" & AEA_data$avisering %in% c("Annat", "Direkt", "F\u00F6rbund"), ]
   }
   
-  if(exists(AEA_member_data)){
+  if(exists("AEA_member_data")){
     if(checkmate::test_names(names(AEA_member_data), must.include = c("ers", "utbprogram", "infopost"))){
       dik_stat[["ers_ej_stud.csv"]] <-
         calc_ers_stat(AEA_member_data)[c(2,4,8)]
@@ -57,7 +57,7 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
   }
 
   # Ers. by sex
-  if(exists(AEA_member_data)){
+  if(exists("AEA_member_data")){
     if(checkmate::test_names(names(AEA_member_data), must.include = c("ers", "utbprogram", "infopost", "kon"))){
       ers_M <-
         calc_ers_stat(AEA_member_data[AEA_member_data$kon == "M", ])[c(1,2,4,8)]
@@ -71,7 +71,7 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
   }
 
   # Counties
-  if(exists(AEA_member_data)){
+  if(exists("AEA_member_data")){
     if(checkmate::test_names(names(AEA_member_data), must.include = c("ers", "utbprogram", "infopost", "lan"))){
       cnty <-
         do.call(rbind, lapply(split(x = AEA_member_data, AEA_member_data$lan), calc_ers_stat))[,c(1,2,4,8)]
@@ -82,7 +82,7 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
     }
   }
 
-  if(exists(AEA_member_data)){
+  if(exists("AEA_member_data")){
     if(checkmate::test_names(names(AEA_member_data), must.include = c("ers", "utbprogram", "infopost", "alder"))){
       # Age
       age_cat <- cut(AEA_member_data$alder, breaks = c(0, seq(25, 65, by = 5)), right = FALSE)
@@ -97,7 +97,7 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
     }
   }
 
-  if(exists(AEA_member_data)){
+  if(exists("AEA_member_data")){
     if(checkmate::test_names(names(AEA_member_data), must.include = c("ers", "utbprogram", "infopost", "intrgrp"))){
       # Intrest group
       AEA_member_data$intrgrp_class <- dik_classify(x = AEA_member_data$intrgrp, type = "intressegrupp", source_folder = classification_source_folder)
@@ -110,7 +110,7 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
     }
   }
   
-  if(exists(AEA_member_data)){
+  if(exists("AEA_member_data")){
     if(checkmate::test_names(names(AEA_member_data), must.include = c("ers", "utbprogram", "infopost", "intrgrp"))){
       # Utb.inriktning 
       AEA_member_data$utbgrp_class <- dik_classify(x = AEA_member_data$utbgrp, type = "utbildningsgrupp", source_folder = classification_source_folder)
@@ -123,7 +123,7 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
     }
   }
   
-  if(exists(AEA_member_data)){
+  if(exists("AEA_member_data")){
     if(checkmate::test_names(names(AEA_member_data), must.include = c("ers", "utbprogram", "infopost", "utbniva"))){
       # Utb.inriktning 
       utb_niv <-

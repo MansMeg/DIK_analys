@@ -29,7 +29,7 @@
 #' @export
 #' 
 read_AEA_file <- function(file_path, stat_var=NULL){
-  if(!file.exists(file_path)) stop("File does not exist.")
+  checkmate::assert_file_exists(file_path)
   if(!is.null(stat_var) & !all(c("anst", "utbniva", "utbgrp", "intrgrp") %in% stat_var)) stop("stat_var do not contain the correct names.")
 
   AEAdf <- read.csv(file = file_path, fileEncoding="cp1252", stringsAsFactors=TRUE)

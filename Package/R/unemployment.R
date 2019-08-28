@@ -90,7 +90,7 @@ calc_dik_stat <- function(AEA_data){
 #' Calculates labor force program statistics
 #' 
 calc_arbmarkn_stat <- function(AEA_data){
-  
+  checkmate::assert_names(AEA_data, must.include = c("utbprogram", "ers", "infopost"))
   arbmark <- table(AEA_data$utbprogram)
 
   arb_program1 <-
@@ -132,7 +132,8 @@ calc_arbmarkn_stat <- function(AEA_data){
 #' Calculate membership statistics
 #' 
 calc_member_aea_stat <- function(AEA_data){
-
+  checkmate::assert_names(names(AEA_data), must.include = c("avisering"))
+  
   av <- table(AEA_data$avisering)
   if("Direkt" %in% names(av)) nam <- "Direkt" else nam <- "Annat"
   
@@ -158,7 +159,7 @@ calc_member_aea_stat <- function(AEA_data){
 #' Calculate allowance statistics for the whole data.
 #' 
 calc_ers_stat <- function(AEA_data){
-
+  checkmate::assert_names(AEA_data, must.include = c("ers", "utbprogram", "infopost"))
   res <- 
     data.frame(tot_i_dik_och_aea = nrow(AEA_data))
   res$ers_tagare_antal <- sum(AEA_data$ers=="X")

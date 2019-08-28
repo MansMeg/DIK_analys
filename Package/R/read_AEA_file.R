@@ -28,7 +28,7 @@
 #' 
 #' @export
 #' 
-read_AEA_file <- function(file_path, stat_var=NULL){
+read_AEA_file <- function(file_path, stat_var = NULL){
   checkmate::assert_file_exists(file_path)
   if(!is.null(stat_var) & !all(c("anst", "utbniva", "utbgrp", "intrgrp") %in% stat_var)) stop("stat_var do not contain the correct names.")
 
@@ -52,7 +52,7 @@ read_AEA_file <- function(file_path, stat_var=NULL){
     names(AEAdf)[names(AEAdf) %in% paste0("stat", 1:5)] <- stat_var
   }
   error_column <- which(names(AEAdf) == "ERROR")
-  if(length(error_column) > 0) warning("The following variables cannot be identified: " , paste(origin_name[error_column], collapse = ", "))
+  if(length(error_column) > 0) warning("The following variables cannot be identified: " , paste(origin_name[error_column], collapse = ", "), call. = FALSE)
   names(AEAdf)[error_column] <- origin_name[error_column]
   
   # Check that classes exist that is needed

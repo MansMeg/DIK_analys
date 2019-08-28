@@ -44,7 +44,7 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
     }
   }
   
-  if(checkmate::test_names(names(AEA_member_data), must.include = c("utbprogram", "ers", "infopost"))){
+  if(checkmate::test_names(names(AEA_data), must.include = c("utbprogram", "ers", "infopost"))){
     arbmark <- calc_arbmarkn_stat(AEA_data)
     dik_stat[["arb_prgm_a.csv"]] <-  
       arbmark[[1]][-nrow(arbmark[[1]]),]

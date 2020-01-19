@@ -33,6 +33,9 @@ read_AEA_file <- function(file_path, stat_var = NULL){
   if(!is.null(stat_var) & !all(c("anst", "utbniva", "utbgrp", "intrgrp") %in% stat_var)) stop("stat_var do not contain the correct names.")
 
   AEAdf <- read.csv(file = file_path, fileEncoding="cp1252", stringsAsFactors=TRUE)
+  if(ncol(AEAdf) == 1){
+    stop("Report: File not in correct format.", call. = FALSE)
+  }  
   
   # File checks
   var_names <- 

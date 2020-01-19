@@ -42,7 +42,7 @@ calc_dik_stat <- function(AEA_data){
   dik_stat[["Medlemmar_ej_65_ar_fyllda_ej_stud"]] <- 
     calc_member_aea_stat(AEA_data = AEA_data[AEA_data$alder < 65 & AEA_data$stat1 != "Studerande", ])
   
-  # Ersättningstagare
+  # Ersattningstagare
   # Remove nonmembers of AEA
   dik_stat[["Ers_aktstod_anststod"]] <-
     calc_ers_stat(AEA_data[AEA_data$alder < 65 & AEA_data$avisering %in% c("Annat", "Direkt", "F\u00F6rbund"), ])

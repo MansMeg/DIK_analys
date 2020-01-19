@@ -63,8 +63,12 @@ read_AEA_file <- function(file_path, stat_var = NULL){
     if(!any(stringr::str_detect(string = levels(AEAdf$utbniva), pattern = " univ"))) warning("'universitet' is missing in variable 'stat2'.", call. = FALSE)
   }
   if(!any(stringr::str_detect(string = levels(AEAdf$utbgrp), pattern = "Humaniora"))) warning("'Humaniora' is missing in variable 'utbgrp'.", call. = FALSE)
-  if(!all(c("F\u00F6rbund") %in% levels(AEAdf$avisering))) warning("'F\u00F6rbund' is missing in variable 'avisering'.", call. = FALSE)
-  if(!any(c("Direkt", "Annat") %in% levels(AEAdf$avisering))) warning("'Direkt' and 'Annat' is missing in variable 'avisering'.", call. = FALSE)
+  if(is.null(levels(AEAdf$avisering))){
+    warning("Report: Variable 'avisering' is empty and will not be used.", call. = FALSE)
+  } else {
+    if(!all(c("F\u00F6rbund") %in% levels(AEAdf$avisering))) warning("'F\u00F6rbund' is missing in variable 'avisering'.", call. = FALSE)
+    if(!any(c("Direkt", "Annat") %in% levels(AEAdf$avisering))) warning("'Direkt' and 'Annat' is missing in variable 'avisering'.", call. = FALSE)
+  }
   if(!all(c("X") %in% levels(AEAdf$ers))) warning("'X' is missing in variable 'ers'.", call. = FALSE)
   if(!all(c("X") %in% levels(AEAdf$infopost))) warning("'X' is missing in variable 'infopost'.", call. = FALSE)
   
@@ -75,7 +79,11 @@ read_AEA_file <- function(file_path, stat_var = NULL){
   class(AEAdf) <- c("AEA_data", "data.frame")
   
   # Do makro checks of data
-  if(table(AEAdf$avisering)["F\u00F6rbund"] < 1000) warning("F\u00F6rbundsaviseringar < 1000")
+  if(is.null(levels(AEAdf$avisering))){
+    warning("Report: Macrocheck 'F\u00F6rbundsaviseringar < 1000' not done.", call. = FALSE)
+  } else {
+    if(table(AEAdf$avisering)["F\u00F6rbund"] < 1000) warning("F\u00F6rbundsaviseringar < 1000")
+  }
   
   return(AEAdf)
 }

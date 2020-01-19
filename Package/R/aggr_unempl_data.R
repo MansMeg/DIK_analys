@@ -21,12 +21,16 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
     dik_stat[["medlemmar_AEA.csv"]] <- 
       calc_member_aea_stat(AEA_data[AEA_data$alder < 65, ])[c(1,2,4)]
     names(dik_stat[["medlemmar_AEA.csv"]]) <- c("Direktaviserade_AEA","Forbundsaviserade_AEA","Medlemmar_DIK_upp_till_65")
+  } else {
+    warning("'medlemmar_AEA.csv' not written ('avisering' or 'alder' is missing)", call. = FALSE)
   }
 
   if(checkmate::test_names(names(AEA_data), must.include = c("avisering", "alder", "anst"))){
     dik_stat[["medlemmar_AEA_ej_stud.csv"]] <- 
       calc_member_aea_stat(AEA_data = AEA_data[AEA_data$alder < 65 & AEA_data$anst != "Studerande", ])[c(1,2,4)]
     names(dik_stat[["medlemmar_AEA_ej_stud.csv"]]) <- c("Direktaviserade_AEA","Forbundsaviserade_AEA","Medlemmar_DIK_upp_till_65")
+  } else {
+    warning("medlemmar_AEA.csv not written ('avisering', 'alder' or 'anst' is missing)", call. = FALSE)
   }
 
   # Ersattningstagare
@@ -34,6 +38,8 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
   # Remove nonmembers of AEA
   if(checkmate::test_names(names(AEA_data), must.include = c("avisering", "alder", "anst"))){
     AEA_member_data <- AEA_data[AEA_data$alder < 65 & AEA_data$anst != "Studerande" & AEA_data$avisering %in% c("Annat", "Direkt", "F\u00F6rbund"), ]
+  } else {
+    warning("'AEA_member_data' can not be selected ('avisering', 'alder' or 'anst' is missing)", call. = FALSE)
   }
   
   if(exists("AEA_member_data")){
@@ -41,6 +47,8 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
       dik_stat[["ers_ej_stud.csv"]] <-
         calc_ers_stat(AEA_member_data)[c(2,4,8)]
       names(dik_stat[["ers_ej_stud.csv"]]) <- c("ers_tagare","akt_stod","anst_m_stod")
+    } else {
+      warning("'ers_ej_stud.csv' can not be computed ('ers', 'utbprogram' or 'infopost' is missing)", call. = FALSE)
     }
   }
   
@@ -54,6 +62,8 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
       arbmark[[2]]
     colnames(dik_stat[["arb_prgm_b.csv"]]) <- 
       c("antal","prgm_utan_ers","akt_stod","ers_tagare_i_akt_stod","anst_m_stod","jug","fas3","ovriga")
+  } else {
+    warning("'arb_prgm_a.csv' and 'arb_prgm_b.csv' cannot be computed ('ers', 'utbprogram' or 'infopost' is missing)", call. = FALSE)
   }
 
   # Ers. by sex
@@ -67,6 +77,8 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
       names(ers_K) <- c("AEA_ansl_K","ers_tagare_K","akt_stod_K","anst_m_stod_K")
       dik_stat[["ers_by_sex.csv"]] <-
         cbind(ers_M, ers_K)[,c(1,5,2,6,3,7,4,8)]
+    } else {
+      warning("'ers_by_sex.csv' cannot be computed ('ers', 'utbprogram', 'kon' or 'infopost' is missing)", call. = FALSE)
     }
   }
 
@@ -79,6 +91,8 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
       colnames(cnty) <- c("county","antal","ers_tagare","akt_stod","anst_m_stod")
       rownames(cnty) <- NULL
       dik_stat[["ers_by_county.csv"]] <- cnty
+    } else {
+      warning("'ers_by_county.csv' cannot be computed ('ers', 'utbprogram', 'lan' or 'infopost' is missing)", call. = FALSE)
     }
   }
 
@@ -94,6 +108,8 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
       colnames(ages) <- c("age_group","antal","ers_tagare","akt_stod","anst_m_stod")
       rownames(ages) <- NULL
       dik_stat[["ers_by_age.csv"]] <- ages
+    } else {
+      warning("'ers_by_age.csv' cannot be computed ('ers', 'utbprogram', 'alder' or 'infopost' is missing)", call. = FALSE)
     }
   }
 
@@ -107,11 +123,13 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
       colnames(intr_group) <- c("intressegrupp","antal","ers_tagare","akt_stod","anst_m_stod")
       rownames(intr_group) <- NULL
       dik_stat[["ers_by_interest_group.csv"]] <- intr_group
+    } else {
+      warning("'ers_by_interest_group.csv' cannot be computed ('ers', 'utbprogram', 'intrgrp' or 'infopost' is missing)", call. = FALSE)
     }
   }
   
   if(exists("AEA_member_data")){
-    if(checkmate::test_names(names(AEA_member_data), must.include = c("ers", "utbprogram", "infopost", "intrgrp"))){
+    if(checkmate::test_names(names(AEA_member_data), must.include = c("ers", "utbprogram", "infopost"))){
       # Utb.inriktning 
       AEA_member_data$utbgrp_class <- dik_classify(x = AEA_member_data$utbgrp, type = "utbildningsgrupp", source_folder = classification_source_folder)
       utb_group <-
@@ -120,6 +138,8 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
       colnames(utb_group) <- c("utb_grupp","antal","ers_tagare","akt_stod","anst_m_stod")
       rownames(utb_group) <- NULL
       dik_stat[["ers_by_education.csv"]] <- utb_group
+    } else {
+      warning("'ers_by_education.csv' cannot be computed ('ers', 'utbprogram', or 'infopost' is missing)", call. = FALSE)
     }
   }
   
@@ -132,6 +152,8 @@ aggr_unempl_data <- function(AEA_data, classification_source_folder = NULL){
       colnames(utb_niv) <- c("utb_niva","antal","ers_tagare","akt_stod","anst_m_stod")
       rownames(utb_niv) <- NULL
       dik_stat[["ers_by_education_level.csv"]] <- utb_niv
+    } else {
+      warning("'ers_by_education_level.csv' cannot be computed ('ers', 'utbprogram', 'utbniva', or 'infopost' is missing)", call. = FALSE)
     }
   }
 

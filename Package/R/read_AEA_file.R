@@ -59,7 +59,12 @@ read_AEA_file <- function(file_path, stat_var = NULL){
   names(AEAdf)[error_column] <- origin_name[error_column]
   
   # Check that classes exist that is needed
-  if(!all(c("Studerande") %in% levels(AEAdf$anst))) warning("'Studerande' is missing in variable 'stat1'.", call. = FALSE)
+  
+  if(is.null(AEAdf$anst)){
+    warning("Report: variable 'anst' is now missing and will not be used.", call. = FALSE)
+  } else {
+    if(!all(c("Studerande") %in% levels(AEAdf$anst))) warning("'Studerande' is missing in variable 'stat1'.", call. = FALSE)
+  }
   if(is.null(AEAdf$utbniva)){
     warning("Report: variable 'utbniva' is now missing and will not be used.", call. = FALSE)
   } else {

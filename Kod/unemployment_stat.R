@@ -4,6 +4,7 @@ lib_path <- "C:/Users/stiham/Rpackages/3.2"
 
 # Install DIK package
 devtools::install_github(repo = "MansMeg/DIK_analys", subdir = "Package")
+devtools::install_local("Package/")
 
 # Load DIK package
 library(DIK)

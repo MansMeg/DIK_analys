@@ -74,6 +74,10 @@ read_AEA_file <- function(file_path, stat_var = NULL){
   if(is.null(levels(AEAdf$avisering))){
     warning("Report: Variable 'avisering' is empty and will not be used.", call. = FALSE)
   } else {
+    if("Forbund" %in% levels(AEAdf$avisering)){
+      levels(AEAdf$avisering)[levels(AEAdf$avisering) == "Forbund"] <- "F\u00F6rbund"
+      message("Edit: 'Forbund' was changed to 'F\u00F6rbund' in the file.")
+    }
     if(!all(c("F\u00F6rbund") %in% levels(AEAdf$avisering))) warning("'F\u00F6rbund' is missing in variable 'avisering'.", call. = FALSE)
     if(!any(c("Direkt", "Annat") %in% levels(AEAdf$avisering))) warning("'Direkt' and 'Annat' is missing in variable 'avisering'.", call. = FALSE)
   }
